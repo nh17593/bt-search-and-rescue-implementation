@@ -1,0 +1,129 @@
+{
+  "_type": "bt_sim_config",
+  "version": "bt-playground-v1",
+  "env": {
+    "walls": [
+      {
+        "x": 130,
+        "y": 40,
+        "w": 8,
+        "h": 70,
+        "label": "W1"
+      },
+      {
+        "x": 200,
+        "y": 80,
+        "w": 70,
+        "h": 8,
+        "label": "W2"
+      },
+      {
+        "x": 270,
+        "y": 80,
+        "w": 8,
+        "h": 60,
+        "label": "W3"
+      },
+      {
+        "x": 160,
+        "y": 105,
+        "w": 8,
+        "h": 35,
+        "label": "W4",
+        "hidden": true,
+        "waitTicks": 15,
+        "timeoutTicks": 25
+      }
+    ],
+    "waypoints": [
+      {
+        "id": "Base",
+        "x": 35,
+        "y": 150
+      },
+      {
+        "id": "SZ",
+        "x": 80,
+        "y": 65
+      },
+      {
+        "id": "RV",
+        "x": 190,
+        "y": 95
+      },
+      {
+        "id": "EX1",
+        "x": 150,
+        "y": 50
+      },
+      {
+        "id": "EX2",
+        "x": 300,
+        "y": 80
+      }
+    ],
+    "packages": [
+      {
+        "x": 100,
+        "y": 100,
+        "label": "V0",
+        "collected": false
+      },
+      {
+        "x": 220,
+        "y": 55,
+        "label": "V1",
+        "collected": false
+      },
+      {
+        "x": 290,
+        "y": 90,
+        "label": "V2",
+        "collected": false,
+        "hidden": true,
+        "waitTicks": 20,
+        "timeoutTicks": 15
+      }
+    ],
+    "collectionZones": [
+      {
+        "x": 60,
+        "y": 45,
+        "w": 40,
+        "h": 40,
+        "label": "Safe Zone",
+        "color": "#22a060",
+        "capacity": 3,
+        "collected": 0
+      }
+    ],
+    "dynObstacles": [],
+    "chargingStations": [
+      {
+        "id": "Base",
+        "label": "Base",
+        "x": 35,
+        "y": 150,
+        "rate": 20
+      }
+    ],
+    "lightSources": []
+  },
+  "globalSettings": {
+    "ROB_SPEED": 10,
+    "SENSOR_RANGE": 200,
+    "COMM_RANGE": 300,
+    "FOV_DEG": 360,
+    "globalBatDrain": 0.7
+  },
+  "robSensorRange": {
+    "0": 200,
+    "1": 80,
+    "2": 42
+  },
+  "robCommRange": {
+    "0": 300,
+    "1": 300,
+    "2": 300
+  }
+}
