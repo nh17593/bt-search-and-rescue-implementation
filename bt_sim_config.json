@@ -1,0 +1,136 @@
+{
+  "_type": "bt_sim_config",
+  "version": "bt-playground-v1",
+  "env": {
+    "walls": [
+      {
+        "x": 130,
+        "y": 40,
+        "w": 8,
+        "h": 70,
+        "label": "W1"
+      },
+      {
+        "x": 200,
+        "y": 80,
+        "w": 70,
+        "h": 8,
+        "label": "W2"
+      },
+      {
+        "x": 270,
+        "y": 80,
+        "w": 8,
+        "h": 60,
+        "label": "W3"
+      },
+      {
+        "x": 160,
+        "y": 105,
+        "w": 8,
+        "h": 35,
+        "label": "W4",
+        "hidden": true,
+        "waitTicks": 15,
+        "timeoutTicks": 25
+      }
+    ],
+    "waypoints": [
+      {
+        "id": "Base",
+        "x": 35,
+        "y": 150
+      },
+      {
+        "id": "SZ",
+        "x": 80,
+        "y": 65
+      },
+      {
+        "id": "RV",
+        "x": 190,
+        "y": 95
+      },
+      {
+        "id": "EX1",
+        "x": 150,
+        "y": 50
+      },
+      {
+        "id": "EX2",
+        "x": 300,
+        "y": 80
+      }
+    ],
+    "packages": [],
+    "collectionZones": [
+      {
+        "x": 55,
+        "y": 45,
+        "w": 55,
+        "h": 45,
+        "label": "Safe Zone",
+        "collected": 0,
+        "capacity": 10
+      }
+    ],
+    "dynObstacles": [],
+    "chargingStations": [
+      {
+        "id": "Base",
+        "label": "Base",
+        "x": 35,
+        "y": 150,
+        "rate": 20
+      }
+    ],
+    "lightSources": [],
+    "victims": [
+      {
+        "id": "V0",
+        "x": 100,
+        "y": 100,
+        "rescued": false,
+        "label": "V0",
+        "color": "#cc4444"
+      },
+      {
+        "id": "V1",
+        "x": 220,
+        "y": 55,
+        "rescued": false,
+        "label": "V1",
+        "color": "#cc8800"
+      },
+      {
+        "id": "V2",
+        "x": 290,
+        "y": 90,
+        "rescued": false,
+        "label": "V2",
+        "color": "#cc0000",
+        "hidden": true,
+        "waitTicks": 20,
+        "timeoutTicks": 15
+      }
+    ],
+    "dirt": []
+  },
+  "globalSettings": {
+    "ROB_SPEED": 10,
+    "SENSOR_RANGE": 200,
+    "COMM_RANGE": 300,
+    "FOV_DEG": 360,
+    "globalBatDrain": 0.7
+  },
+  "robSensorRange": {
+    "0": 200,
+    "1": 80,
+    "2": 42
+  },
+  "robCommRange": {
+    "0": 300,
+    "1": 300,
+    "2": 300
+  }
+}

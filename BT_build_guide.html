@@ -1,0 +1,269 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Human Victim Rescue — Three Robot Build Guide</title>
+<style>body{font:16px/1.55 system-ui,sans-serif;color:#193047;max-width:1240px;margin:36px auto;padding:0 24px}h1,h2,h3{color:#103f61}h2{margin-top:40px;border-top:2px solid #d3e0e9;padding-top:18px}a{color:#096887}nav{display:flex;gap:18px;flex-wrap:wrap}pre{background:#eef4f7;padding:16px;border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.5 ui-monospace,monospace}table{width:100%;border-collapse:collapse;font-size:13px;margin:18px 0}th,td{border:1px solid #c6d5e0;padding:9px;text-align:left;vertical-align:top}th{background:#e5eef4}.callout{background:#fff5df;border-left:4px solid #c17b00;padding:14px 18px}.success{background:#eaf5ee;border-left:4px solid #32744e;padding:14px 18px}code{font-family:ui-monospace,monospace}summary{cursor:pointer;font-weight:650}details{margin:16px 0}li{margin:8px 0}@media print{body{margin:0;max-width:none;font-size:11px}table{font-size:9px}pre{font-size:9px}tr{break-inside:avoid}nav{display:none}}</style>
+</head><body><h1>Human Victim Rescue: Scout, Medic, Guard</h1>
+<p>Importable trees and exact manual node settings for the native human-victim <b>Operation Quick Rescue</b> scene. Reviewed upstream commit: <code>d9db22b22fe4b4f3c2c13436ccee6dd010bb60e8</code>.</p>
+<nav><a href="#setup">Setup</a><a href="#scout">Scout</a><a href="#medic">Medic</a><a href="#guard">Guard</a><a href="#checks">Verification</a></nav>
+<div class="callout"><b>Native rescue semantics:</b> Rescue Victim marks a human rescued in place and increments the robot's human-rescue count. Medic then returns to SZ by itself. These trees do not simulate carrying or delivering human bodies. The package-delivery count stays zero.</div>
+<h2 id="setup">Setup and repeat trials</h2>
+<p>Read <a href="README.txt">README.txt</a> for the full setup, source references, limits and verification procedure.</p>
+<ol><li>Open a fresh playground page. Select <b>Operation Quick Rescue</b> to initialize native humans and V2's schedule.</li>
+<li>Import <a href="bt_tree.json">bt_tree.json</a> and <a href="bt_sim_config.json">bt_sim_config.json</a> together, then Apply.</li>
+<li>Confirm R1 → R1 Scout, R2 → R2 Medic, R3 → R3 Guard. Select the <b>imported R1 Scout tab</b> before Reset. This restores Scout's three ID filters from its library entry.</li>
+<li>Set Robot speed=10, FOV=360°, sensor ranges R1=200/R2=80/R3=42, communication ranges=300, battery drain=0.7. Press Reset once before the first step.</li>
+<li>Run with Scout's tree displayed. Use Explain or the BB selector to inspect other robots. Changing BT tabs during a run remaps IDs used by task memory.</li>
+<li><b>Every new trial:</b> reload the page, reload Operation Quick Rescue, reimport both files, select Scout, set speed and Reset. Reset alone does not restore human rescued flags or V2's consumed schedule.</li></ol>
+<p>The JSON importer's environment handling omits human victims. The supplied victim array documents the intended scene, but loading the native human scene first is required. There are zero packages. The native Safe Zone rectangle is retained.</p>
+<h2>Manual build conventions</h2>
+<p>Create one BT per robot. Tables list preorder numbers, parents and children. Preserve the exact left-to-right sibling order; the engine sorts siblings by horizontal canvas position. Decorators and Root have one child. P3 on Victim Near? is the <b>ID filter</b>; do not omit it.</p>
+<p>Put a coordinate pair entirely in Navigate To's Target/P1, leaving P2 empty. Human Approach nodes use the local BB key <code>target_V0</code>, <code>target_V1</code> or <code>target_V2</code>. The current engine resolves those keys to Scout's received coordinates. Use each table's exact Config Params.</p>
+<p>All mission BB state is local. Topic names retain their leading slash. Publish Topic uses <code>bb:report</code> and sends a JSON string; Medic Read Topic writes the string to <code>victim_report</code>. Do not replace it with a native object without adapting the receiver. Current topics are global and ignore communication range.</p>
+<p>Custom Process code appears below each tree and in matching .js files. Paste it in the node's Expression field. It runs inside the node; do not execute those snippets in DevTools.</p>
+<h2 id="scout">R1 Scout</h2><p>Every tick, read corridor topics, independently sense V0/V1/V2 using native ID-filtered human sensors, remember visible coordinates, publish a cumulative report, and resume the exploration itinerary. The report never directly queries ENV.victims. Each sensor failure is optional, so hidden V2 cannot block other reports.</p>
+<table><thead><tr><th>#</th><th>Parent</th><th>Type / exact label</th><th>Settings</th><th>Children, left to right</th></tr></thead><tbody>
+<tr><td>1</td><td>—</td><td><b>Root</b><br>Scout root</td><td></td><td>2</td></tr>
+<tr><td>2</td><td>1</td><td><b>Sequence</b><br>Scout services and exploration</td><td></td><td>3, 8, 24</td></tr>
+<tr><td>3</td><td>2</td><td><b>Sequence</b><br>Read corridor topics</td><td></td><td>4, 6</td></tr>
+<tr><td>4</td><td>3</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>5</td></tr>
+<tr><td>5</td><td>4</td><td><b>Read Topic</b><br>Read /corridor_blocked</td><td>P1 = /corridor_blocked<br>P2 = corridor_blocked</td><td></td></tr>
+<tr><td>6</td><td>3</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>7</td></tr>
+<tr><td>7</td><td>6</td><td><b>Read Topic</b><br>Read /corridor_clear</td><td>P1 = /corridor_clear<br>P2 = corridor_clear</td><td></td></tr>
+<tr><td>8</td><td>2</td><td><b>Sequence</b><br>Sense humans and announce</td><td></td><td>9, 13, 17, 21, 22</td></tr>
+<tr><td>9</td><td>8</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>10</td></tr>
+<tr><td>10</td><td>9</td><td><b>Sequence</b><br>Observe V0</td><td></td><td>11, 12</td></tr>
+<tr><td>11</td><td>10</td><td><b>Victim Near?</b><br>Detect visible V0</td><td>P1 = 0<br>P2 = 360<br>P3 = V0</td><td></td></tr>
+<tr><td>12</td><td>10</td><td><b>Custom Process</b><br>Remember V0</td><td>Expression: see Remember V0 below.</td><td></td></tr>
+<tr><td>13</td><td>8</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>14</td></tr>
+<tr><td>14</td><td>13</td><td><b>Sequence</b><br>Observe V1</td><td></td><td>15, 16</td></tr>
+<tr><td>15</td><td>14</td><td><b>Victim Near?</b><br>Detect visible V1</td><td>P1 = 0<br>P2 = 360<br>P3 = V1</td><td></td></tr>
+<tr><td>16</td><td>14</td><td><b>Custom Process</b><br>Remember V1</td><td>Expression: see Remember V1 below.</td><td></td></tr>
+<tr><td>17</td><td>8</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>18</td></tr>
+<tr><td>18</td><td>17</td><td><b>Sequence</b><br>Observe V2</td><td></td><td>19, 20</td></tr>
+<tr><td>19</td><td>18</td><td><b>Victim Near?</b><br>Detect visible V2</td><td>P1 = 0<br>P2 = 360<br>P3 = V2</td><td></td></tr>
+<tr><td>20</td><td>18</td><td><b>Custom Process</b><br>Remember V2</td><td>Expression: see Remember V2 below.</td><td></td></tr>
+<tr><td>21</td><td>8</td><td><b>Custom Process</b><br>Prepare victim report</td><td>Expression: see Prepare victim report below.</td><td></td></tr>
+<tr><td>22</td><td>8</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>23</td></tr>
+<tr><td>23</td><td>22</td><td><b>Publish Topic</b><br>Publish victim report</td><td>P1 = /victim_found<br>P2 = bb:report</td><td></td></tr>
+<tr><td>24</td><td>2</td><td><b>Repeat N</b><br>Repeat exploration</td><td>P1 = 1000</td><td>25</td></tr>
+<tr><td>25</td><td>24</td><td><b>Mem.Sequence</b><br>Explore EX1 EX2 RV</td><td></td><td>26, 27, 28, 29, 39, 40, 41, 42, 43, 44</td></tr>
+<tr><td>26</td><td>25</td><td><b>Navigate To</b><br>Navigate 110,25</td><td>P1 = 110,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>27</td><td>25</td><td><b>Navigate To</b><br>Navigate 155,25</td><td>P1 = 155,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>28</td><td>25</td><td><b>Navigate To</b><br>Navigate EX1</td><td>P1 = EX1<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>29</td><td>25</td><td><b>Selector</b><br>Select exploration route</td><td></td><td>30, 36</td></tr>
+<tr><td>30</td><td>29</td><td><b>Sequence</b><br>EX2 bypass when blocked</td><td></td><td>31, 32</td></tr>
+<tr><td>31</td><td>30</td><td><b>Check BB</b><br>corridor_blocked == true</td><td>P1 = corridor_blocked == true<br>P2 = local</td><td></td></tr>
+<tr><td>32</td><td>30</td><td><b>Mem.Sequence</b><br>Upper bypass to EX2</td><td></td><td>33, 34, 35</td></tr>
+<tr><td>33</td><td>32</td><td><b>Navigate To</b><br>Navigate 155,25</td><td>P1 = 155,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>34</td><td>32</td><td><b>Navigate To</b><br>Navigate 300,25</td><td>P1 = 300,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>35</td><td>32</td><td><b>Navigate To</b><br>Navigate EX2</td><td>P1 = EX2<br>Config Params: {&quot;arrivalDist&quot;: 12, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>36</td><td>29</td><td><b>Mem.Sequence</b><br>EX2 normal route</td><td></td><td>37, 38</td></tr>
+<tr><td>37</td><td>36</td><td><b>Navigate To</b><br>Navigate 290,55</td><td>P1 = 290,55<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>38</td><td>36</td><td><b>Navigate To</b><br>Navigate EX2</td><td>P1 = EX2<br>Config Params: {&quot;arrivalDist&quot;: 12, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>39</td><td>25</td><td><b>Navigate To</b><br>Navigate 300,155</td><td>P1 = 300,155<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>40</td><td>25</td><td><b>Navigate To</b><br>Navigate 190,155</td><td>P1 = 190,155<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>41</td><td>25</td><td><b>Navigate To</b><br>Navigate RV</td><td>P1 = RV<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>42</td><td>25</td><td><b>Navigate To</b><br>Navigate 155,25</td><td>P1 = 155,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>43</td><td>25</td><td><b>Navigate To</b><br>Navigate 110,25</td><td>P1 = 110,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>44</td><td>25</td><td><b>Wait</b><br>Exploration turnaround</td><td>P1 = 1</td><td></td></tr>
+</tbody></table>
+<details open><summary>Custom Process: Remember V0</summary><pre>// Coordinates come only from the preceding Victim Near? sensor.
+bb.found = bb.found || {};
+const id = bb.victim_id;
+bb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,
+  expires:id===&#x27;V2&#x27; ? 35 : null};</pre></details>
+<details open><summary>Custom Process: Remember V1</summary><pre>// Coordinates come only from the preceding Victim Near? sensor.
+bb.found = bb.found || {};
+const id = bb.victim_id;
+bb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,
+  expires:id===&#x27;V2&#x27; ? 35 : null};</pre></details>
+<details open><summary>Custom Process: Remember V2</summary><pre>// Coordinates come only from the preceding Victim Near? sensor.
+bb.found = bb.found || {};
+const id = bb.victim_id;
+bb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,
+  expires:id===&#x27;V2&#x27; ? 35 : null};</pre></details>
+<details open><summary>Custom Process: Prepare victim report</summary><pre>// Keep this a JSON string: Medic reads it into bb.victim_report.
+// V2&#x27;s deadline is supplied by the fixed Operation Quick Rescue scene.
+bb.report = JSON.stringify({tick:tick,found:bb.found || {}});</pre></details>
+<h2 id="medic">R2 Medic</h2><p>Read the report and corridor topics before work. Priorities are V2 rescue, return to SZ, V1 rescue, V0 rescue, safe completion, then east-side staging. Every rescue requires a visible ID-filtered human within range. Record completion only after the native rescue action succeeds. V2 has an absolute tick-35 deadline and a 14-tick attempt bound. North/East SZ return points retain the utility choice.</p>
+<table><thead><tr><th>#</th><th>Parent</th><th>Type / exact label</th><th>Settings</th><th>Children, left to right</th></tr></thead><tbody>
+<tr><td>1</td><td>—</td><td><b>Root</b><br>Medic root</td><td></td><td>2</td></tr>
+<tr><td>2</td><td>1</td><td><b>Sequence</b><br>Medic services and work</td><td></td><td>3, 10, 11</td></tr>
+<tr><td>3</td><td>2</td><td><b>Sequence</b><br>Receive topics</td><td></td><td>4, 6, 8</td></tr>
+<tr><td>4</td><td>3</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>5</td></tr>
+<tr><td>5</td><td>4</td><td><b>Read Topic</b><br>Read /victim_found</td><td>P1 = /victim_found<br>P2 = victim_report</td><td></td></tr>
+<tr><td>6</td><td>3</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>7</td></tr>
+<tr><td>7</td><td>6</td><td><b>Read Topic</b><br>Read /corridor_blocked</td><td>P1 = /corridor_blocked<br>P2 = corridor_blocked</td><td></td></tr>
+<tr><td>8</td><td>3</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>9</td></tr>
+<tr><td>9</td><td>8</td><td><b>Read Topic</b><br>Read /corridor_clear</td><td>P1 = /corridor_clear<br>P2 = corridor_clear</td><td></td></tr>
+<tr><td>10</td><td>2</td><td><b>Custom Process</b><br>Update received mission</td><td>Expression: see Update received mission below.</td><td></td></tr>
+<tr><td>11</td><td>2</td><td><b>Repeat N</b><br>Repeat medic work</td><td>P1 = 1000</td><td>12</td></tr>
+<tr><td>12</td><td>11</td><td><b>Selector</b><br>Medic priorities</td><td></td><td>13, 35, 73, 91, 98, 101</td></tr>
+<tr><td>13</td><td>12</td><td><b>Sequence</b><br>Urgent V2 rescue</td><td></td><td>14, 15</td></tr>
+<tr><td>14</td><td>13</td><td><b>Check BB</b><br>urgent == true</td><td>P1 = urgent == true<br>P2 = local</td><td></td></tr>
+<tr><td>15</td><td>13</td><td><b>Selector</b><br>Bounded V2 attempt</td><td></td><td>16, 32</td></tr>
+<tr><td>16</td><td>15</td><td><b>Timeout</b><br>V2 deadline</td><td>P1 = 14</td><td>17</td></tr>
+<tr><td>17</td><td>16</td><td><b>Selector</b><br>V2 route</td><td></td><td>18, 27</td></tr>
+<tr><td>18</td><td>17</td><td><b>Sequence</b><br>V2 blocked bypass</td><td></td><td>19, 20</td></tr>
+<tr><td>19</td><td>18</td><td><b>Check BB</b><br>corridor_blocked == true</td><td>P1 = corridor_blocked == true<br>P2 = local</td><td></td></tr>
+<tr><td>20</td><td>18</td><td><b>Mem.Sequence</b><br>V2 lower bypass</td><td></td><td>21, 22</td></tr>
+<tr><td>21</td><td>20</td><td><b>Navigate To</b><br>Navigate 295,155</td><td>P1 = 295,155<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>22</td><td>20</td><td><b>Mem.Sequence</b><br>Rescue V2</td><td></td><td>23, 24, 25, 26</td></tr>
+<tr><td>23</td><td>22</td><td><b>Navigate To</b><br>Approach V2</td><td>P1 = target_V2<br>Config Params: {&quot;arrivalDist&quot;: 24, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>24</td><td>22</td><td><b>Victim Near?</b><br>Confirm visible V2 within rescue range</td><td>P1 = 25<br>P2 = 360<br>P3 = V2</td><td></td></tr>
+<tr><td>25</td><td>22</td><td><b>Rescue Victim</b><br>Rescue human V2</td><td>P1 = 25</td><td></td></tr>
+<tr><td>26</td><td>22</td><td><b>Custom Process</b><br>Record V2</td><td>Expression: see Record V2 below.</td><td></td></tr>
+<tr><td>27</td><td>17</td><td><b>Mem.Sequence</b><br>Rescue V2</td><td></td><td>28, 29, 30, 31</td></tr>
+<tr><td>28</td><td>27</td><td><b>Navigate To</b><br>Approach V2</td><td>P1 = target_V2<br>Config Params: {&quot;arrivalDist&quot;: 24, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>29</td><td>27</td><td><b>Victim Near?</b><br>Confirm visible V2 within rescue range</td><td>P1 = 25<br>P2 = 360<br>P3 = V2</td><td></td></tr>
+<tr><td>30</td><td>27</td><td><b>Rescue Victim</b><br>Rescue human V2</td><td>P1 = 25</td><td></td></tr>
+<tr><td>31</td><td>27</td><td><b>Custom Process</b><br>Record V2</td><td>Expression: see Record V2 below.</td><td></td></tr>
+<tr><td>32</td><td>15</td><td><b>Sequence</b><br>Record V2 timeout</td><td></td><td>33, 34</td></tr>
+<tr><td>33</td><td>32</td><td><b>Set True</b><br>V2 attempt timed out</td><td>P1 = v2_timedout</td><td></td></tr>
+<tr><td>34</td><td>32</td><td><b>FALSE</b><br>Allow fallback</td><td></td><td></td></tr>
+<tr><td>35</td><td>12</td><td><b>Sequence</b><br>Return to SZ after rescue</td><td></td><td>36, 37, 38, 39, 40</td></tr>
+<tr><td>36</td><td>35</td><td><b>Check BB</b><br>return_active == true</td><td>P1 = return_active == true<br>P2 = local</td><td></td></tr>
+<tr><td>37</td><td>35</td><td><b>Custom Process</b><br>Score SZ return points</td><td>Expression: see Score SZ return points below.</td><td></td></tr>
+<tr><td>38</td><td>35</td><td><b>Utility Change</b><br>Score North</td><td>P1 = Return North<br>P2 = set<br>P3 = bb:score_north</td><td></td></tr>
+<tr><td>39</td><td>35</td><td><b>Utility Change</b><br>Score East</td><td>P1 = Return East<br>P2 = set<br>P3 = bb:score_east</td><td></td></tr>
+<tr><td>40</td><td>35</td><td><b>Utility Selector</b><br>Choose SZ return point</td><td>P1 = max</td><td>41, 57</td></tr>
+<tr><td>41</td><td>40</td><td><b>Mem.Sequence</b><br>Return North</td><td></td><td>42, 55, 56</td></tr>
+<tr><td>42</td><td>41</td><td><b>Selector</b><br>Return path North</td><td></td><td>43, 49, 54</td></tr>
+<tr><td>43</td><td>42</td><td><b>Sequence</b><br>V2 return North</td><td></td><td>44, 45</td></tr>
+<tr><td>44</td><td>43</td><td><b>Check BB</b><br>last_rescued == V2</td><td>P1 = last_rescued == V2<br>P2 = local</td><td></td></tr>
+<tr><td>45</td><td>43</td><td><b>Mem.Sequence</b><br>V2 return waypoints North</td><td></td><td>46, 47, 48</td></tr>
+<tr><td>46</td><td>45</td><td><b>Navigate To</b><br>Navigate 295,55</td><td>P1 = 295,55<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>47</td><td>45</td><td><b>Navigate To</b><br>Navigate 150,25</td><td>P1 = 150,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>48</td><td>45</td><td><b>Navigate To</b><br>Navigate 115,25</td><td>P1 = 115,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>49</td><td>42</td><td><b>Sequence</b><br>V1 return North</td><td></td><td>50, 51</td></tr>
+<tr><td>50</td><td>49</td><td><b>Check BB</b><br>last_rescued == V1</td><td>P1 = last_rescued == V1<br>P2 = local</td><td></td></tr>
+<tr><td>51</td><td>49</td><td><b>Mem.Sequence</b><br>V1 return waypoints North</td><td></td><td>52, 53</td></tr>
+<tr><td>52</td><td>51</td><td><b>Navigate To</b><br>Navigate 150,25</td><td>P1 = 150,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>53</td><td>51</td><td><b>Navigate To</b><br>Navigate 115,25</td><td>P1 = 115,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>54</td><td>42</td><td><b>TRUE</b><br>Already west of W1 North</td><td></td><td></td></tr>
+<tr><td>55</td><td>41</td><td><b>Navigate To</b><br>Reach SZ North</td><td>P1 = 95,50<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>56</td><td>41</td><td><b>Custom Process</b><br>Finish return North</td><td>Expression: see Finish return North below.</td><td></td></tr>
+<tr><td>57</td><td>40</td><td><b>Mem.Sequence</b><br>Return East</td><td></td><td>58, 71, 72</td></tr>
+<tr><td>58</td><td>57</td><td><b>Selector</b><br>Return path East</td><td></td><td>59, 65, 70</td></tr>
+<tr><td>59</td><td>58</td><td><b>Sequence</b><br>V2 return East</td><td></td><td>60, 61</td></tr>
+<tr><td>60</td><td>59</td><td><b>Check BB</b><br>last_rescued == V2</td><td>P1 = last_rescued == V2<br>P2 = local</td><td></td></tr>
+<tr><td>61</td><td>59</td><td><b>Mem.Sequence</b><br>V2 return waypoints East</td><td></td><td>62, 63, 64</td></tr>
+<tr><td>62</td><td>61</td><td><b>Navigate To</b><br>Navigate 295,55</td><td>P1 = 295,55<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>63</td><td>61</td><td><b>Navigate To</b><br>Navigate 150,25</td><td>P1 = 150,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>64</td><td>61</td><td><b>Navigate To</b><br>Navigate 115,25</td><td>P1 = 115,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>65</td><td>58</td><td><b>Sequence</b><br>V1 return East</td><td></td><td>66, 67</td></tr>
+<tr><td>66</td><td>65</td><td><b>Check BB</b><br>last_rescued == V1</td><td>P1 = last_rescued == V1<br>P2 = local</td><td></td></tr>
+<tr><td>67</td><td>65</td><td><b>Mem.Sequence</b><br>V1 return waypoints East</td><td></td><td>68, 69</td></tr>
+<tr><td>68</td><td>67</td><td><b>Navigate To</b><br>Navigate 150,25</td><td>P1 = 150,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>69</td><td>67</td><td><b>Navigate To</b><br>Navigate 115,25</td><td>P1 = 115,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>70</td><td>58</td><td><b>TRUE</b><br>Already west of W1 East</td><td></td><td></td></tr>
+<tr><td>71</td><td>57</td><td><b>Navigate To</b><br>Reach SZ East</td><td>P1 = 95,80<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>72</td><td>57</td><td><b>Custom Process</b><br>Finish return East</td><td>Expression: see Finish return East below.</td><td></td></tr>
+<tr><td>73</td><td>12</td><td><b>Sequence</b><br>Ordinary V1 rescue</td><td></td><td>74, 75</td></tr>
+<tr><td>74</td><td>73</td><td><b>Check BB</b><br>ordinary_allowed == true AND pending_V1 == true</td><td>P1 = ordinary_allowed == true AND pending_V1 == true<br>P2 = local</td><td></td></tr>
+<tr><td>75</td><td>73</td><td><b>Mem.Sequence</b><br>V1 upper approach</td><td></td><td>76, 86</td></tr>
+<tr><td>76</td><td>75</td><td><b>Selector</b><br>Select V1 approach</td><td></td><td>77, 82</td></tr>
+<tr><td>77</td><td>76</td><td><b>Sequence</b><br>After V2 rescue</td><td></td><td>78, 79</td></tr>
+<tr><td>78</td><td>77</td><td><b>Check BB</b><br>pending_V2 == false</td><td>P1 = pending_V2 == false<br>P2 = local</td><td></td></tr>
+<tr><td>79</td><td>77</td><td><b>Mem.Sequence</b><br>V1 west approach</td><td></td><td>80, 81</td></tr>
+<tr><td>80</td><td>79</td><td><b>Navigate To</b><br>Navigate 115,25</td><td>P1 = 115,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>81</td><td>79</td><td><b>Navigate To</b><br>Navigate 150,25</td><td>P1 = 150,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>82</td><td>76</td><td><b>Mem.Sequence</b><br>V1 approach after missed V2</td><td></td><td>83, 84, 85</td></tr>
+<tr><td>83</td><td>82</td><td><b>Navigate To</b><br>Navigate 295,155</td><td>P1 = 295,155<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>84</td><td>82</td><td><b>Navigate To</b><br>Navigate 295,55</td><td>P1 = 295,55<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>85</td><td>82</td><td><b>Navigate To</b><br>Navigate 150,25</td><td>P1 = 150,25<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>86</td><td>75</td><td><b>Mem.Sequence</b><br>Rescue V1</td><td></td><td>87, 88, 89, 90</td></tr>
+<tr><td>87</td><td>86</td><td><b>Navigate To</b><br>Approach V1</td><td>P1 = target_V1<br>Config Params: {&quot;arrivalDist&quot;: 24, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>88</td><td>86</td><td><b>Victim Near?</b><br>Confirm visible V1 within rescue range</td><td>P1 = 25<br>P2 = 360<br>P3 = V1</td><td></td></tr>
+<tr><td>89</td><td>86</td><td><b>Rescue Victim</b><br>Rescue human V1</td><td>P1 = 25</td><td></td></tr>
+<tr><td>90</td><td>86</td><td><b>Custom Process</b><br>Record V1</td><td>Expression: see Record V1 below.</td><td></td></tr>
+<tr><td>91</td><td>12</td><td><b>Sequence</b><br>Ordinary V0 rescue</td><td></td><td>92, 93</td></tr>
+<tr><td>92</td><td>91</td><td><b>Check BB</b><br>ordinary_allowed == true AND pending_V0 == true</td><td>P1 = ordinary_allowed == true AND pending_V0 == true<br>P2 = local</td><td></td></tr>
+<tr><td>93</td><td>91</td><td><b>Mem.Sequence</b><br>Rescue V0</td><td></td><td>94, 95, 96, 97</td></tr>
+<tr><td>94</td><td>93</td><td><b>Navigate To</b><br>Approach V0</td><td>P1 = target_V0<br>Config Params: {&quot;arrivalDist&quot;: 24, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>95</td><td>93</td><td><b>Victim Near?</b><br>Confirm visible V0 within rescue range</td><td>P1 = 25<br>P2 = 360<br>P3 = V0</td><td></td></tr>
+<tr><td>96</td><td>93</td><td><b>Rescue Victim</b><br>Rescue human V0</td><td>P1 = 25</td><td></td></tr>
+<tr><td>97</td><td>93</td><td><b>Custom Process</b><br>Record V0</td><td>Expression: see Record V0 below.</td><td></td></tr>
+<tr><td>98</td><td>12</td><td><b>Sequence</b><br>Available rescues complete</td><td></td><td>99, 100</td></tr>
+<tr><td>99</td><td>98</td><td><b>Check BB</b><br>mission_finished == true</td><td>P1 = mission_finished == true<br>P2 = local</td><td></td></tr>
+<tr><td>100</td><td>98</td><td><b>Wait</b><br>Wait safely at SZ</td><td>P1 = 1</td><td></td></tr>
+<tr><td>101</td><td>12</td><td><b>Mem.Sequence</b><br>Stage east of facility</td><td></td><td>102, 103</td></tr>
+<tr><td>102</td><td>101</td><td><b>Navigate To</b><br>Navigate 295,155</td><td>P1 = 295,155<br>Config Params: {&quot;arrivalDist&quot;: 6, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>103</td><td>101</td><td><b>Wait</b><br>Wait for rescue report</td><td>P1 = 1</td><td></td></tr>
+</tbody></table>
+<details open><summary>Custom Process: Update received mission</summary><pre>// No ENV victim lookup: mission locations come from Scout&#x27;s received topic.
+bb.known = bb.known || {};
+bb.done = bb.done || {};
+if (typeof bb.victim_report === &#x27;string&#x27;) {
+  try {
+    const report = JSON.parse(bb.victim_report);
+    for (const [id, v] of Object.entries(report.found || {})) {
+      if ([&#x27;V0&#x27;,&#x27;V1&#x27;,&#x27;V2&#x27;].includes(id) &amp;&amp; Number.isFinite(v.x) &amp;&amp; Number.isFinite(v.y)) {
+        bb.known[id] = v;
+      }
+    }
+  } catch (e) {}
+}
+const v2 = bb.known.V2;
+const deadline = v2 &amp;&amp; Number.isFinite(v2.expires) ? v2.expires : 35;
+bb.urgent = !!(v2 &amp;&amp; !bb.done.V2 &amp;&amp; !bb.v2_timedout &amp;&amp; tick &lt; deadline);
+bb.ordinary_allowed = !!(bb.done.V2 || bb.v2_timedout || tick &gt;= deadline);
+for (const id of [&#x27;V0&#x27;,&#x27;V1&#x27;,&#x27;V2&#x27;]) {
+  bb[&#x27;pending_&#x27;+id] = !!(bb.known[id] &amp;&amp; !bb.done[id]);
+  if (bb.known[id]) bb[&#x27;target_&#x27;+id] = bb.known[id].x+&#x27;,&#x27;+bb.known[id].y;
+}
+bb.all_rescued = !!(bb.done.V0 &amp;&amp; bb.done.V1 &amp;&amp; bb.done.V2);
+bb.mission_finished = !!(bb.done.V0 &amp;&amp; bb.done.V1 &amp;&amp; (bb.done.V2 || bb.v2_timedout || tick &gt;= deadline));</pre></details>
+<details open><summary>Custom Process: Record V2</summary><pre>bb.done[&#x27;V2&#x27;]=true; bb.last_rescued=&#x27;V2&#x27;; bb.return_active=true;</pre></details>
+<details open><summary>Custom Process: Score SZ return points</summary><pre>if (!bb.return_scored) {
+  const right=rob.wx&gt;148;
+  const prefix=right ? (bb.last_rescued===&#x27;V2&#x27;
+    ? Math.hypot(rob.wx-295,rob.wy-55)+Math.hypot(295-150,55-25)+35
+    : Math.hypot(rob.wx-150,rob.wy-25)+35) : 0;
+  const cost=(x,y)=&gt;right ? prefix+Math.hypot(115-x,25-y) : Math.hypot(rob.wx-x,rob.wy-y);
+  bb.score_north=1000/(1+cost(95,50));
+  bb.score_east=1000/(1+cost(95,80));
+  bb.return_scored=true;
+}</pre></details>
+<details open><summary>Custom Process: Finish return North</summary><pre>bb.return_active=false;
+bb.return_scored=false;
+bb.returns_completed=(bb.returns_completed||0)+1;</pre></details>
+<details open><summary>Custom Process: Finish return East</summary><pre>bb.return_active=false;
+bb.return_scored=false;
+bb.returns_completed=(bb.returns_completed||0)+1;</pre></details>
+<details open><summary>Custom Process: Record V1</summary><pre>bb.done[&#x27;V1&#x27;]=true; bb.last_rescued=&#x27;V1&#x27;; bb.return_active=true;</pre></details>
+<details open><summary>Custom Process: Record V0</summary><pre>bb.done[&#x27;V0&#x27;]=true; bb.last_rescued=&#x27;V0&#x27;; bb.return_active=true;</pre></details>
+<h2 id="guard">R3 Guard</h2><p>The original RV obstacle watch is preserved. Range 42 and FOV 360° isolate W4 in this fixed scene. Publish complementary Boolean blocked/clear states, with a separate Cooldown(2) for each branch.</p>
+<table><thead><tr><th>#</th><th>Parent</th><th>Type / exact label</th><th>Settings</th><th>Children, left to right</th></tr></thead><tbody>
+<tr><td>1</td><td>—</td><td><b>Root</b><br>Guard root</td><td></td><td>2</td></tr>
+<tr><td>2</td><td>1</td><td><b>Repeat N</b><br>Repeat corridor watch</td><td>P1 = 1000</td><td>3</td></tr>
+<tr><td>3</td><td>2</td><td><b>Mem.Sequence</b><br>Reach RV then monitor</td><td></td><td>4, 5</td></tr>
+<tr><td>4</td><td>3</td><td><b>Navigate To</b><br>Navigate RV</td><td>P1 = RV<br>Config Params: {&quot;arrivalDist&quot;: 2, &quot;look&quot;: 28, &quot;N&quot;: 72, &quot;avoid&quot;: 1.2}</td><td></td></tr>
+<tr><td>5</td><td>3</td><td><b>Selector</b><br>Report corridor</td><td></td><td>6, 14</td></tr>
+<tr><td>6</td><td>5</td><td><b>Sequence</b><br>Corridor blocked</td><td></td><td>7, 8</td></tr>
+<tr><td>7</td><td>6</td><td><b>Obstacle?</b><br>Detect W4 corridor</td><td>P1 = 42<br>P2 = 360</td><td></td></tr>
+<tr><td>8</td><td>6</td><td><b>Cooldown</b><br>Limit corridor broadcasts</td><td>P1 = 2</td><td>9</td></tr>
+<tr><td>9</td><td>8</td><td><b>Sequence</b><br>Publish corridor state</td><td></td><td>10, 12</td></tr>
+<tr><td>10</td><td>9</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>11</td></tr>
+<tr><td>11</td><td>10</td><td><b>Publish Topic</b><br>Publish blocked True</td><td>P1 = /corridor_blocked<br>P2 = true</td><td></td></tr>
+<tr><td>12</td><td>9</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>13</td></tr>
+<tr><td>13</td><td>12</td><td><b>Publish Topic</b><br>Publish clear False</td><td>P1 = /corridor_clear<br>P2 = false</td><td></td></tr>
+<tr><td>14</td><td>5</td><td><b>Sequence</b><br>Corridor clear</td><td></td><td>15, 17</td></tr>
+<tr><td>15</td><td>14</td><td><b>Inverter</b><br>No corridor obstacle</td><td></td><td>16</td></tr>
+<tr><td>16</td><td>15</td><td><b>Obstacle?</b><br>Detect W4 corridor clear</td><td>P1 = 42<br>P2 = 360</td><td></td></tr>
+<tr><td>17</td><td>14</td><td><b>Cooldown</b><br>Limit corridor broadcasts</td><td>P1 = 2</td><td>18</td></tr>
+<tr><td>18</td><td>17</td><td><b>Sequence</b><br>Publish corridor state</td><td></td><td>19, 21</td></tr>
+<tr><td>19</td><td>18</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>20</td></tr>
+<tr><td>20</td><td>19</td><td><b>Publish Topic</b><br>Publish blocked False</td><td>P1 = /corridor_blocked<br>P2 = false</td><td></td></tr>
+<tr><td>21</td><td>18</td><td><b>Force Success</b><br>Optional operation</td><td></td><td>22</td></tr>
+<tr><td>22</td><td>21</td><td><b>Publish Topic</b><br>Publish clear True</td><td>P1 = /corridor_clear<br>P2 = true</td><td></td></tr>
+</tbody></table>
+<h2 id="checks">Reference results and browser verification</h2>
+<div class="success"><b>Source-engine checks passed:</b> all three structural validators, the normal human rescue mission, communication blackout and an earlier V2 disappearance. The reference engine uses the native human scene with unchanged sensing, navigation, rescue, topic and scheduling functions. Display and DOM work use adapters. A browser pass has not been established.</div>
+<table><tr><th>Native human rescue event</th><th>Source-engine reference tick</th></tr><tr><td>V2 reported / received</td><td>20</td></tr><tr><td>V2 rescued</td><td>30 (before 35)</td></tr><tr><td>V1 rescued</td><td>74</td></tr><tr><td>V0 rescued</td><td>94</td></tr><tr><td>Medic returns to SZ</td><td>57, 89, 99</td></tr><tr><td>All humans rescued / Medic safe by</td><td>100</td></tr></table>
+<p>Full adapter summary: <a href="REFERENCE_RESULTS.json">REFERENCE_RESULTS.json</a>. To reproduce it, download the pinned upstream index.html and run <code>node verify_reference.cjs /absolute/path/to/index.html</code>. The script verifies the source hash and needs no npm packages.</p>
+<p>For your actual browser run, pause at 20 and verify Scout's report and Medic's known.V2; around 30 verify the native V2 rescue log and rescued flag; by 100 verify all three human flags, Medic victims_found=3 and three completed SZ returns. Do not use the package-delivery metric.</p>
+<p>On a separate fresh trial, paste <a href="browser_verify.js">browser_verify.js</a> into DevTools at tick 0 to run 100 real steps and download actual human-state evidence. The native log/replay omits the human victim array, so retain this supplemental evidence plus screenshots. Your own browser results should be reported independently of the source-engine reference.</p>
+<p>Native source quirks relevant to the check: a hidden human may still be drawn; the scheduler may log V2 timing out after it was rescued; Rescue Victim itself lacks a hidden-state check. The trees therefore confirm visible presence immediately before rescue. Judge availability and success using sensor results, hidden/rescued flags, and native rescue events.</p>
+<p>V2 expires=35 is specific to this scene. If its timing changes, update that absolute deadline in Scout's Remember code and Medic's Update received mission fallback. The sensor guard still prevents rescuing an absent victim. The earlier-expiry regression intentionally leaves cached expiry=35 and verifies this protection.</p>
+<p>Source: <a href="https://github.com/herolab-uga/robotics-bt-playground/blob/d9db22b22fe4b4f3c2c13436ccee6dd010bb60e8/index.html">reviewed upstream index.html</a>. No upstream engine or GitHub repository files were changed.</p></body></html>
