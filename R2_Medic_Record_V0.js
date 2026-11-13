@@ -1,1 +1,0 @@
-bb.done['V0']=true; bb.carry_id='V0';
