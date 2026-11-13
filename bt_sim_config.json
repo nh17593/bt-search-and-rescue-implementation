@@ -62,39 +62,16 @@
         "y": 80
       }
     ],
-    "packages": [
-      {
-        "x": 100,
-        "y": 100,
-        "label": "V0",
-        "collected": false
-      },
-      {
-        "x": 220,
-        "y": 55,
-        "label": "V1",
-        "collected": false
-      },
-      {
-        "x": 290,
-        "y": 90,
-        "label": "V2",
-        "collected": false,
-        "hidden": true,
-        "waitTicks": 20,
-        "timeoutTicks": 15
-      }
-    ],
+    "packages": [],
     "collectionZones": [
       {
-        "x": 60,
+        "x": 55,
         "y": 45,
-        "w": 40,
-        "h": 40,
+        "w": 55,
+        "h": 45,
         "label": "Safe Zone",
-        "color": "#22a060",
-        "capacity": 3,
-        "collected": 0
+        "collected": 0,
+        "capacity": 10
       }
     ],
     "dynObstacles": [],
@@ -107,7 +84,37 @@
         "rate": 20
       }
     ],
-    "lightSources": []
+    "lightSources": [],
+    "victims": [
+      {
+        "id": "V0",
+        "x": 100,
+        "y": 100,
+        "rescued": false,
+        "label": "V0",
+        "color": "#cc4444"
+      },
+      {
+        "id": "V1",
+        "x": 220,
+        "y": 55,
+        "rescued": false,
+        "label": "V1",
+        "color": "#cc8800"
+      },
+      {
+        "id": "V2",
+        "x": 290,
+        "y": 90,
+        "rescued": false,
+        "label": "V2",
+        "color": "#cc0000",
+        "hidden": true,
+        "waitTicks": 20,
+        "timeoutTicks": 15
+      }
+    ],
+    "dirt": []
   },
   "globalSettings": {
     "ROB_SPEED": 10,

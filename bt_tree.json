@@ -47,7 +47,7 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 175,
+      "x": 180,
       "y": 420,
       "children": []
     },
@@ -63,7 +63,7 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 175.0,
+      "x": 180.0,
       "y": 315,
       "children": [
         "R1 Scout_3"
@@ -81,7 +81,7 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 87.5,
+      "x": 90.0,
       "y": 210,
       "children": [
         "R1 Scout_2",
@@ -90,8 +90,40 @@
     },
     {
       "id": "R1 Scout_6",
-      "type": "a_scan",
-      "label": "Scan facility",
+      "type": "c_victim",
+      "label": "Detect visible V0",
+      "p1": "0",
+      "p2": "360",
+      "p3": "V0",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 360,
+      "y": 525,
+      "children": []
+    },
+    {
+      "id": "R1 Scout_7",
+      "type": "a_custom",
+      "label": "Remember V0",
+      "p1": "// Coordinates come only from the preceding Victim Near? sensor.\nbb.found = bb.found || {};\nconst id = bb.victim_id;\nbb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,\n  expires:id==='V2' ? 35 : null};",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 540,
+      "y": 525,
+      "children": []
+    },
+    {
+      "id": "R1 Scout_8",
+      "type": "sequence",
+      "label": "Observe V0",
       "p1": "",
       "p2": "",
       "p3": "",
@@ -100,60 +132,15 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 350,
-      "y": 315,
-      "children": []
-    },
-    {
-      "id": "R1 Scout_7",
-      "type": "a_wait",
-      "label": "Process scan",
-      "p1": "1",
-      "p2": "",
-      "p3": "",
-      "params": {},
-      "utility": 0,
-      "robotAs": -1,
-      "status": "idle",
-      "note": "",
-      "x": 525,
-      "y": 315,
-      "children": []
-    },
-    {
-      "id": "R1 Scout_8",
-      "type": "a_custom",
-      "label": "Prepare victim report",
-      "p1": "// Perception: inspect only physically present packages within R1's sensor/FOV.\nbb.found = bb.found || {};\nfor (const p of ENV.packages) {\n  if (p.hidden || p.collected) continue;\n  if (!inFOVfull(rob, p.x, p.y, getRobSensor(rob), FOV_DEG)) continue;\n  bb.found[p.label] = {id:p.label,x:p.x,y:p.y,\n    expires:p.timeoutTicks ? p._visibleSince + p.timeoutTicks : null};\n}\nbb.report = JSON.stringify({tick:tick,found:bb.found});\n// Bind a local node parameter. Publish Topic does not evaluate bb references.\nconst pub = Object.values(nodes).find(n => n.label === 'Publish victim report');\nif (pub) { pub.params = pub.params || {}; pub.params.payload = bb.report; }\n",
-      "p2": "",
-      "p3": "",
-      "params": {},
-      "utility": 0,
-      "robotAs": -1,
-      "status": "idle",
-      "note": "",
-      "x": 700,
-      "y": 315,
-      "children": []
+      "x": 450.0,
+      "y": 420,
+      "children": [
+        "R1 Scout_6",
+        "R1 Scout_7"
+      ]
     },
     {
       "id": "R1 Scout_9",
-      "type": "a_pub_topic",
-      "label": "Publish victim report",
-      "p1": "/victim_found",
-      "p2": "~payload",
-      "p3": "",
-      "params": {},
-      "utility": 0,
-      "robotAs": -1,
-      "status": "idle",
-      "note": "",
-      "x": 875,
-      "y": 420,
-      "children": []
-    },
-    {
-      "id": "R1 Scout_10",
       "type": "force_ok",
       "label": "Optional operation",
       "p1": "",
@@ -164,16 +151,48 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 875.0,
+      "x": 450.0,
       "y": 315,
       "children": [
-        "R1 Scout_9"
+        "R1 Scout_8"
       ]
     },
     {
+      "id": "R1 Scout_10",
+      "type": "c_victim",
+      "label": "Detect visible V1",
+      "p1": "0",
+      "p2": "360",
+      "p3": "V1",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 720,
+      "y": 525,
+      "children": []
+    },
+    {
       "id": "R1 Scout_11",
-      "type": "mem_seq",
-      "label": "Scan and announce",
+      "type": "a_custom",
+      "label": "Remember V1",
+      "p1": "// Coordinates come only from the preceding Victim Near? sensor.\nbb.found = bb.found || {};\nconst id = bb.victim_id;\nbb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,\n  expires:id==='V2' ? 35 : null};",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 900,
+      "y": 525,
+      "children": []
+    },
+    {
+      "id": "R1 Scout_12",
+      "type": "sequence",
+      "label": "Observe V1",
       "p1": "",
       "p2": "",
       "p3": "",
@@ -182,17 +201,174 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 612.5,
-      "y": 210,
+      "x": 810.0,
+      "y": 420,
       "children": [
-        "R1 Scout_6",
-        "R1 Scout_7",
-        "R1 Scout_8",
-        "R1 Scout_10"
+        "R1 Scout_10",
+        "R1 Scout_11"
       ]
     },
     {
-      "id": "R1 Scout_12",
+      "id": "R1 Scout_13",
+      "type": "force_ok",
+      "label": "Optional operation",
+      "p1": "",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 810.0,
+      "y": 315,
+      "children": [
+        "R1 Scout_12"
+      ]
+    },
+    {
+      "id": "R1 Scout_14",
+      "type": "c_victim",
+      "label": "Detect visible V2",
+      "p1": "0",
+      "p2": "360",
+      "p3": "V2",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1080,
+      "y": 525,
+      "children": []
+    },
+    {
+      "id": "R1 Scout_15",
+      "type": "a_custom",
+      "label": "Remember V2",
+      "p1": "// Coordinates come only from the preceding Victim Near? sensor.\nbb.found = bb.found || {};\nconst id = bb.victim_id;\nbb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,\n  expires:id==='V2' ? 35 : null};",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1260,
+      "y": 525,
+      "children": []
+    },
+    {
+      "id": "R1 Scout_16",
+      "type": "sequence",
+      "label": "Observe V2",
+      "p1": "",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1170.0,
+      "y": 420,
+      "children": [
+        "R1 Scout_14",
+        "R1 Scout_15"
+      ]
+    },
+    {
+      "id": "R1 Scout_17",
+      "type": "force_ok",
+      "label": "Optional operation",
+      "p1": "",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1170.0,
+      "y": 315,
+      "children": [
+        "R1 Scout_16"
+      ]
+    },
+    {
+      "id": "R1 Scout_18",
+      "type": "a_custom",
+      "label": "Prepare victim report",
+      "p1": "// Keep this a JSON string: Medic reads it into bb.victim_report.\n// V2's deadline is supplied by the fixed Operation Quick Rescue scene.\nbb.report = JSON.stringify({tick:tick,found:bb.found || {}});",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1440,
+      "y": 315,
+      "children": []
+    },
+    {
+      "id": "R1 Scout_19",
+      "type": "a_pub_topic",
+      "label": "Publish victim report",
+      "p1": "/victim_found",
+      "p2": "bb:report",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1620,
+      "y": 420,
+      "children": []
+    },
+    {
+      "id": "R1 Scout_20",
+      "type": "force_ok",
+      "label": "Optional operation",
+      "p1": "",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1620.0,
+      "y": 315,
+      "children": [
+        "R1 Scout_19"
+      ]
+    },
+    {
+      "id": "R1 Scout_21",
+      "type": "sequence",
+      "label": "Sense humans and announce",
+      "p1": "",
+      "p2": "",
+      "p3": "",
+      "params": {},
+      "utility": 0,
+      "robotAs": -1,
+      "status": "idle",
+      "note": "",
+      "x": 1098.0,
+      "y": 210,
+      "children": [
+        "R1 Scout_9",
+        "R1 Scout_13",
+        "R1 Scout_17",
+        "R1 Scout_18",
+        "R1 Scout_20"
+      ]
+    },
+    {
+      "id": "R1 Scout_22",
       "type": "c_bb_cmp",
       "label": "corridor_blocked == true",
       "p1": "corridor_blocked == true",
@@ -203,12 +379,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1575,
+      "x": 2340,
       "y": 630,
       "children": []
     },
     {
-      "id": "R1 Scout_13",
+      "id": "R1 Scout_23",
       "type": "a_nav_to",
       "label": "Navigate 155,25",
       "p1": "155,25",
@@ -224,12 +400,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1750,
+      "x": 2520,
       "y": 735,
       "children": []
     },
     {
-      "id": "R1 Scout_14",
+      "id": "R1 Scout_24",
       "type": "a_nav_to",
       "label": "Navigate 300,25",
       "p1": "300,25",
@@ -245,19 +421,19 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1925,
+      "x": 2700,
       "y": 735,
       "children": []
     },
     {
-      "id": "R1 Scout_15",
+      "id": "R1 Scout_25",
       "type": "a_nav_to",
       "label": "Navigate EX2",
       "p1": "EX2",
       "p2": "",
       "p3": "",
       "params": {
-        "arrivalDist": 6,
+        "arrivalDist": 12,
         "look": 28,
         "N": 72,
         "avoid": 1.2
@@ -266,12 +442,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2100,
+      "x": 2880,
       "y": 735,
       "children": []
     },
     {
-      "id": "R1 Scout_16",
+      "id": "R1 Scout_26",
       "type": "mem_seq",
       "label": "Upper bypass to EX2",
       "p1": "",
@@ -282,16 +458,16 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1925.0,
+      "x": 2700.0,
       "y": 630,
       "children": [
-        "R1 Scout_13",
-        "R1 Scout_14",
-        "R1 Scout_15"
+        "R1 Scout_23",
+        "R1 Scout_24",
+        "R1 Scout_25"
       ]
     },
     {
-      "id": "R1 Scout_17",
+      "id": "R1 Scout_27",
       "type": "sequence",
       "label": "EX2 bypass when blocked",
       "p1": "",
@@ -302,15 +478,15 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1750.0,
+      "x": 2520.0,
       "y": 525,
       "children": [
-        "R1 Scout_12",
-        "R1 Scout_16"
+        "R1 Scout_22",
+        "R1 Scout_26"
       ]
     },
     {
-      "id": "R1 Scout_18",
+      "id": "R1 Scout_28",
       "type": "a_nav_to",
       "label": "Navigate 290,55",
       "p1": "290,55",
@@ -326,19 +502,19 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2275,
+      "x": 3060,
       "y": 630,
       "children": []
     },
     {
-      "id": "R1 Scout_19",
+      "id": "R1 Scout_29",
       "type": "a_nav_to",
       "label": "Navigate EX2",
       "p1": "EX2",
       "p2": "",
       "p3": "",
       "params": {
-        "arrivalDist": 6,
+        "arrivalDist": 12,
         "look": 28,
         "N": 72,
         "avoid": 1.2
@@ -347,12 +523,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2450,
+      "x": 3240,
       "y": 630,
       "children": []
     },
     {
-      "id": "R1 Scout_20",
+      "id": "R1 Scout_30",
       "type": "mem_seq",
       "label": "EX2 normal route",
       "p1": "",
@@ -363,15 +539,15 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2362.5,
+      "x": 3150.0,
       "y": 525,
       "children": [
-        "R1 Scout_18",
-        "R1 Scout_19"
+        "R1 Scout_28",
+        "R1 Scout_29"
       ]
     },
     {
-      "id": "R1 Scout_21",
+      "id": "R1 Scout_31",
       "type": "a_nav_to",
       "label": "Navigate 110,25",
       "p1": "110,25",
@@ -387,12 +563,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1050,
+      "x": 1800,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_22",
+      "id": "R1 Scout_32",
       "type": "a_nav_to",
       "label": "Navigate 155,25",
       "p1": "155,25",
@@ -408,12 +584,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1225,
+      "x": 1980,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_23",
+      "id": "R1 Scout_33",
       "type": "a_nav_to",
       "label": "Navigate EX1",
       "p1": "EX1",
@@ -429,12 +605,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1400,
+      "x": 2160,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_24",
+      "id": "R1 Scout_34",
       "type": "selector",
       "label": "Select exploration route",
       "p1": "",
@@ -445,15 +621,15 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2056.25,
+      "x": 2835.0,
       "y": 420,
       "children": [
-        "R1 Scout_17",
-        "R1 Scout_20"
+        "R1 Scout_27",
+        "R1 Scout_30"
       ]
     },
     {
-      "id": "R1 Scout_25",
+      "id": "R1 Scout_35",
       "type": "a_nav_to",
       "label": "Navigate 300,155",
       "p1": "300,155",
@@ -469,12 +645,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2625,
+      "x": 3420,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_26",
+      "id": "R1 Scout_36",
       "type": "a_nav_to",
       "label": "Navigate 190,155",
       "p1": "190,155",
@@ -490,12 +666,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2800,
+      "x": 3600,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_27",
+      "id": "R1 Scout_37",
       "type": "a_nav_to",
       "label": "Navigate RV",
       "p1": "RV",
@@ -511,12 +687,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2975,
+      "x": 3780,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_28",
+      "id": "R1 Scout_38",
       "type": "a_nav_to",
       "label": "Navigate 155,25",
       "p1": "155,25",
@@ -532,12 +708,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 3150,
+      "x": 3960,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_29",
+      "id": "R1 Scout_39",
       "type": "a_nav_to",
       "label": "Navigate 110,25",
       "p1": "110,25",
@@ -553,12 +729,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 3325,
+      "x": 4140,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_30",
+      "id": "R1 Scout_40",
       "type": "a_wait",
       "label": "Exploration turnaround",
       "p1": "1",
@@ -569,12 +745,12 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 3500,
+      "x": 4320,
       "y": 420,
       "children": []
     },
     {
-      "id": "R1 Scout_31",
+      "id": "R1 Scout_41",
       "type": "mem_seq",
       "label": "Explore EX1 EX2 RV",
       "p1": "",
@@ -585,23 +761,23 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2410.625,
+      "x": 3199.5,
       "y": 315,
       "children": [
-        "R1 Scout_21",
-        "R1 Scout_22",
-        "R1 Scout_23",
-        "R1 Scout_24",
-        "R1 Scout_25",
-        "R1 Scout_26",
-        "R1 Scout_27",
-        "R1 Scout_28",
-        "R1 Scout_29",
-        "R1 Scout_30"
+        "R1 Scout_31",
+        "R1 Scout_32",
+        "R1 Scout_33",
+        "R1 Scout_34",
+        "R1 Scout_35",
+        "R1 Scout_36",
+        "R1 Scout_37",
+        "R1 Scout_38",
+        "R1 Scout_39",
+        "R1 Scout_40"
       ]
     },
     {
-      "id": "R1 Scout_32",
+      "id": "R1 Scout_42",
       "type": "repeat",
       "label": "Repeat exploration",
       "p1": "1000",
@@ -612,14 +788,14 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 2410.625,
+      "x": 3199.5,
       "y": 210,
       "children": [
-        "R1 Scout_31"
+        "R1 Scout_41"
       ]
     },
     {
-      "id": "R1 Scout_33",
+      "id": "R1 Scout_43",
       "type": "sequence",
       "label": "Scout services and exploration",
       "p1": "",
@@ -630,16 +806,16 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1036.875,
+      "x": 1462.5,
       "y": 105,
       "children": [
         "R1 Scout_5",
-        "R1 Scout_11",
-        "R1 Scout_32"
+        "R1 Scout_21",
+        "R1 Scout_42"
       ]
     },
     {
-      "id": "R1 Scout_34",
+      "id": "R1 Scout_44",
       "type": "root",
       "label": "Scout root",
       "p1": "",
@@ -650,10 +826,10 @@
       "robotAs": -1,
       "status": "idle",
       "note": "",
-      "x": 1036.875,
+      "x": 1462.5,
       "y": 0,
       "children": [
-        "R1 Scout_33"
+        "R1 Scout_43"
       ]
     }
   ],
@@ -675,28 +851,28 @@
       "to": "R1 Scout_4"
     },
     {
-      "from": "R1 Scout_10",
-      "to": "R1 Scout_9"
-    },
-    {
-      "from": "R1 Scout_11",
+      "from": "R1 Scout_8",
       "to": "R1 Scout_6"
     },
     {
-      "from": "R1 Scout_11",
+      "from": "R1 Scout_8",
       "to": "R1 Scout_7"
     },
     {
-      "from": "R1 Scout_11",
+      "from": "R1 Scout_9",
       "to": "R1 Scout_8"
     },
     {
-      "from": "R1 Scout_11",
+      "from": "R1 Scout_12",
       "to": "R1 Scout_10"
     },
     {
-      "from": "R1 Scout_16",
-      "to": "R1 Scout_13"
+      "from": "R1 Scout_12",
+      "to": "R1 Scout_11"
+    },
+    {
+      "from": "R1 Scout_13",
+      "to": "R1 Scout_12"
     },
     {
       "from": "R1 Scout_16",
@@ -708,87 +884,127 @@
     },
     {
       "from": "R1 Scout_17",
-      "to": "R1 Scout_12"
-    },
-    {
-      "from": "R1 Scout_17",
       "to": "R1 Scout_16"
-    },
-    {
-      "from": "R1 Scout_20",
-      "to": "R1 Scout_18"
     },
     {
       "from": "R1 Scout_20",
       "to": "R1 Scout_19"
     },
     {
-      "from": "R1 Scout_24",
+      "from": "R1 Scout_21",
+      "to": "R1 Scout_9"
+    },
+    {
+      "from": "R1 Scout_21",
+      "to": "R1 Scout_13"
+    },
+    {
+      "from": "R1 Scout_21",
       "to": "R1 Scout_17"
     },
     {
-      "from": "R1 Scout_24",
+      "from": "R1 Scout_21",
+      "to": "R1 Scout_18"
+    },
+    {
+      "from": "R1 Scout_21",
       "to": "R1 Scout_20"
     },
     {
-      "from": "R1 Scout_31",
-      "to": "R1 Scout_21"
-    },
-    {
-      "from": "R1 Scout_31",
-      "to": "R1 Scout_22"
-    },
-    {
-      "from": "R1 Scout_31",
+      "from": "R1 Scout_26",
       "to": "R1 Scout_23"
     },
     {
-      "from": "R1 Scout_31",
+      "from": "R1 Scout_26",
       "to": "R1 Scout_24"
     },
     {
-      "from": "R1 Scout_31",
+      "from": "R1 Scout_26",
       "to": "R1 Scout_25"
     },
     {
-      "from": "R1 Scout_31",
+      "from": "R1 Scout_27",
+      "to": "R1 Scout_22"
+    },
+    {
+      "from": "R1 Scout_27",
       "to": "R1 Scout_26"
     },
     {
-      "from": "R1 Scout_31",
-      "to": "R1 Scout_27"
-    },
-    {
-      "from": "R1 Scout_31",
+      "from": "R1 Scout_30",
       "to": "R1 Scout_28"
     },
     {
-      "from": "R1 Scout_31",
+      "from": "R1 Scout_30",
       "to": "R1 Scout_29"
     },
     {
-      "from": "R1 Scout_31",
-      "to": "R1 Scout_30"
-    },
-    {
-      "from": "R1 Scout_32",
-      "to": "R1 Scout_31"
-    },
-    {
-      "from": "R1 Scout_33",
-      "to": "R1 Scout_5"
-    },
-    {
-      "from": "R1 Scout_33",
-      "to": "R1 Scout_11"
-    },
-    {
-      "from": "R1 Scout_33",
-      "to": "R1 Scout_32"
+      "from": "R1 Scout_34",
+      "to": "R1 Scout_27"
     },
     {
       "from": "R1 Scout_34",
+      "to": "R1 Scout_30"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_31"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_32"
+    },
+    {
+      "from": "R1 Scout_41",
       "to": "R1 Scout_33"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_34"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_35"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_36"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_37"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_38"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_39"
+    },
+    {
+      "from": "R1 Scout_41",
+      "to": "R1 Scout_40"
+    },
+    {
+      "from": "R1 Scout_42",
+      "to": "R1 Scout_41"
+    },
+    {
+      "from": "R1 Scout_43",
+      "to": "R1 Scout_5"
+    },
+    {
+      "from": "R1 Scout_43",
+      "to": "R1 Scout_21"
+    },
+    {
+      "from": "R1 Scout_43",
+      "to": "R1 Scout_42"
+    },
+    {
+      "from": "R1 Scout_44",
+      "to": "R1 Scout_43"
     }
   ],
   "robots": 3,
@@ -843,7 +1059,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 175,
+          "x": 180,
           "y": 420,
           "children": []
         },
@@ -859,7 +1075,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 175.0,
+          "x": 180.0,
           "y": 315,
           "children": [
             "R1 Scout_3"
@@ -877,7 +1093,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 87.5,
+          "x": 90.0,
           "y": 210,
           "children": [
             "R1 Scout_2",
@@ -886,8 +1102,40 @@
         },
         "R1 Scout_6": {
           "id": "R1 Scout_6",
-          "type": "a_scan",
-          "label": "Scan facility",
+          "type": "c_victim",
+          "label": "Detect visible V0",
+          "p1": "0",
+          "p2": "360",
+          "p3": "V0",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 360,
+          "y": 525,
+          "children": []
+        },
+        "R1 Scout_7": {
+          "id": "R1 Scout_7",
+          "type": "a_custom",
+          "label": "Remember V0",
+          "p1": "// Coordinates come only from the preceding Victim Near? sensor.\nbb.found = bb.found || {};\nconst id = bb.victim_id;\nbb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,\n  expires:id==='V2' ? 35 : null};",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 540,
+          "y": 525,
+          "children": []
+        },
+        "R1 Scout_8": {
+          "id": "R1 Scout_8",
+          "type": "sequence",
+          "label": "Observe V0",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -896,60 +1144,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 350,
-          "y": 315,
-          "children": []
-        },
-        "R1 Scout_7": {
-          "id": "R1 Scout_7",
-          "type": "a_wait",
-          "label": "Process scan",
-          "p1": "1",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 525,
-          "y": 315,
-          "children": []
-        },
-        "R1 Scout_8": {
-          "id": "R1 Scout_8",
-          "type": "a_custom",
-          "label": "Prepare victim report",
-          "p1": "// Perception: inspect only physically present packages within R1's sensor/FOV.\nbb.found = bb.found || {};\nfor (const p of ENV.packages) {\n  if (p.hidden || p.collected) continue;\n  if (!inFOVfull(rob, p.x, p.y, getRobSensor(rob), FOV_DEG)) continue;\n  bb.found[p.label] = {id:p.label,x:p.x,y:p.y,\n    expires:p.timeoutTicks ? p._visibleSince + p.timeoutTicks : null};\n}\nbb.report = JSON.stringify({tick:tick,found:bb.found});\n// Bind a local node parameter. Publish Topic does not evaluate bb references.\nconst pub = Object.values(nodes).find(n => n.label === 'Publish victim report');\nif (pub) { pub.params = pub.params || {}; pub.params.payload = bb.report; }\n",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 700,
-          "y": 315,
-          "children": []
+          "x": 450.0,
+          "y": 420,
+          "children": [
+            "R1 Scout_6",
+            "R1 Scout_7"
+          ]
         },
         "R1 Scout_9": {
           "id": "R1 Scout_9",
-          "type": "a_pub_topic",
-          "label": "Publish victim report",
-          "p1": "/victim_found",
-          "p2": "~payload",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 875,
-          "y": 420,
-          "children": []
-        },
-        "R1 Scout_10": {
-          "id": "R1 Scout_10",
           "type": "force_ok",
           "label": "Optional operation",
           "p1": "",
@@ -960,16 +1163,48 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 875.0,
+          "x": 450.0,
           "y": 315,
           "children": [
-            "R1 Scout_9"
+            "R1 Scout_8"
           ]
+        },
+        "R1 Scout_10": {
+          "id": "R1 Scout_10",
+          "type": "c_victim",
+          "label": "Detect visible V1",
+          "p1": "0",
+          "p2": "360",
+          "p3": "V1",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 720,
+          "y": 525,
+          "children": []
         },
         "R1 Scout_11": {
           "id": "R1 Scout_11",
-          "type": "mem_seq",
-          "label": "Scan and announce",
+          "type": "a_custom",
+          "label": "Remember V1",
+          "p1": "// Coordinates come only from the preceding Victim Near? sensor.\nbb.found = bb.found || {};\nconst id = bb.victim_id;\nbb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,\n  expires:id==='V2' ? 35 : null};",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 900,
+          "y": 525,
+          "children": []
+        },
+        "R1 Scout_12": {
+          "id": "R1 Scout_12",
+          "type": "sequence",
+          "label": "Observe V1",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -978,17 +1213,174 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 612.5,
-          "y": 210,
+          "x": 810.0,
+          "y": 420,
           "children": [
-            "R1 Scout_6",
-            "R1 Scout_7",
-            "R1 Scout_8",
-            "R1 Scout_10"
+            "R1 Scout_10",
+            "R1 Scout_11"
           ]
         },
-        "R1 Scout_12": {
-          "id": "R1 Scout_12",
+        "R1 Scout_13": {
+          "id": "R1 Scout_13",
+          "type": "force_ok",
+          "label": "Optional operation",
+          "p1": "",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 810.0,
+          "y": 315,
+          "children": [
+            "R1 Scout_12"
+          ]
+        },
+        "R1 Scout_14": {
+          "id": "R1 Scout_14",
+          "type": "c_victim",
+          "label": "Detect visible V2",
+          "p1": "0",
+          "p2": "360",
+          "p3": "V2",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1080,
+          "y": 525,
+          "children": []
+        },
+        "R1 Scout_15": {
+          "id": "R1 Scout_15",
+          "type": "a_custom",
+          "label": "Remember V2",
+          "p1": "// Coordinates come only from the preceding Victim Near? sensor.\nbb.found = bb.found || {};\nconst id = bb.victim_id;\nbb.found[id] = {id:id,x:bb.victim_x,y:bb.victim_y,\n  expires:id==='V2' ? 35 : null};",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1260,
+          "y": 525,
+          "children": []
+        },
+        "R1 Scout_16": {
+          "id": "R1 Scout_16",
+          "type": "sequence",
+          "label": "Observe V2",
+          "p1": "",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1170.0,
+          "y": 420,
+          "children": [
+            "R1 Scout_14",
+            "R1 Scout_15"
+          ]
+        },
+        "R1 Scout_17": {
+          "id": "R1 Scout_17",
+          "type": "force_ok",
+          "label": "Optional operation",
+          "p1": "",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1170.0,
+          "y": 315,
+          "children": [
+            "R1 Scout_16"
+          ]
+        },
+        "R1 Scout_18": {
+          "id": "R1 Scout_18",
+          "type": "a_custom",
+          "label": "Prepare victim report",
+          "p1": "// Keep this a JSON string: Medic reads it into bb.victim_report.\n// V2's deadline is supplied by the fixed Operation Quick Rescue scene.\nbb.report = JSON.stringify({tick:tick,found:bb.found || {}});",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1440,
+          "y": 315,
+          "children": []
+        },
+        "R1 Scout_19": {
+          "id": "R1 Scout_19",
+          "type": "a_pub_topic",
+          "label": "Publish victim report",
+          "p1": "/victim_found",
+          "p2": "bb:report",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1620,
+          "y": 420,
+          "children": []
+        },
+        "R1 Scout_20": {
+          "id": "R1 Scout_20",
+          "type": "force_ok",
+          "label": "Optional operation",
+          "p1": "",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1620.0,
+          "y": 315,
+          "children": [
+            "R1 Scout_19"
+          ]
+        },
+        "R1 Scout_21": {
+          "id": "R1 Scout_21",
+          "type": "sequence",
+          "label": "Sense humans and announce",
+          "p1": "",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1098.0,
+          "y": 210,
+          "children": [
+            "R1 Scout_9",
+            "R1 Scout_13",
+            "R1 Scout_17",
+            "R1 Scout_18",
+            "R1 Scout_20"
+          ]
+        },
+        "R1 Scout_22": {
+          "id": "R1 Scout_22",
           "type": "c_bb_cmp",
           "label": "corridor_blocked == true",
           "p1": "corridor_blocked == true",
@@ -999,12 +1391,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1575,
+          "x": 2340,
           "y": 630,
           "children": []
         },
-        "R1 Scout_13": {
-          "id": "R1 Scout_13",
+        "R1 Scout_23": {
+          "id": "R1 Scout_23",
           "type": "a_nav_to",
           "label": "Navigate 155,25",
           "p1": "155,25",
@@ -1020,12 +1412,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1750,
+          "x": 2520,
           "y": 735,
           "children": []
         },
-        "R1 Scout_14": {
-          "id": "R1 Scout_14",
+        "R1 Scout_24": {
+          "id": "R1 Scout_24",
           "type": "a_nav_to",
           "label": "Navigate 300,25",
           "p1": "300,25",
@@ -1041,19 +1433,19 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1925,
+          "x": 2700,
           "y": 735,
           "children": []
         },
-        "R1 Scout_15": {
-          "id": "R1 Scout_15",
+        "R1 Scout_25": {
+          "id": "R1 Scout_25",
           "type": "a_nav_to",
           "label": "Navigate EX2",
           "p1": "EX2",
           "p2": "",
           "p3": "",
           "params": {
-            "arrivalDist": 6,
+            "arrivalDist": 12,
             "look": 28,
             "N": 72,
             "avoid": 1.2
@@ -1062,12 +1454,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2100,
+          "x": 2880,
           "y": 735,
           "children": []
         },
-        "R1 Scout_16": {
-          "id": "R1 Scout_16",
+        "R1 Scout_26": {
+          "id": "R1 Scout_26",
           "type": "mem_seq",
           "label": "Upper bypass to EX2",
           "p1": "",
@@ -1078,16 +1470,16 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1925.0,
+          "x": 2700.0,
           "y": 630,
           "children": [
-            "R1 Scout_13",
-            "R1 Scout_14",
-            "R1 Scout_15"
+            "R1 Scout_23",
+            "R1 Scout_24",
+            "R1 Scout_25"
           ]
         },
-        "R1 Scout_17": {
-          "id": "R1 Scout_17",
+        "R1 Scout_27": {
+          "id": "R1 Scout_27",
           "type": "sequence",
           "label": "EX2 bypass when blocked",
           "p1": "",
@@ -1098,15 +1490,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1750.0,
+          "x": 2520.0,
           "y": 525,
           "children": [
-            "R1 Scout_12",
-            "R1 Scout_16"
+            "R1 Scout_22",
+            "R1 Scout_26"
           ]
         },
-        "R1 Scout_18": {
-          "id": "R1 Scout_18",
+        "R1 Scout_28": {
+          "id": "R1 Scout_28",
           "type": "a_nav_to",
           "label": "Navigate 290,55",
           "p1": "290,55",
@@ -1122,19 +1514,19 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2275,
+          "x": 3060,
           "y": 630,
           "children": []
         },
-        "R1 Scout_19": {
-          "id": "R1 Scout_19",
+        "R1 Scout_29": {
+          "id": "R1 Scout_29",
           "type": "a_nav_to",
           "label": "Navigate EX2",
           "p1": "EX2",
           "p2": "",
           "p3": "",
           "params": {
-            "arrivalDist": 6,
+            "arrivalDist": 12,
             "look": 28,
             "N": 72,
             "avoid": 1.2
@@ -1143,12 +1535,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2450,
+          "x": 3240,
           "y": 630,
           "children": []
         },
-        "R1 Scout_20": {
-          "id": "R1 Scout_20",
+        "R1 Scout_30": {
+          "id": "R1 Scout_30",
           "type": "mem_seq",
           "label": "EX2 normal route",
           "p1": "",
@@ -1159,15 +1551,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2362.5,
+          "x": 3150.0,
           "y": 525,
           "children": [
-            "R1 Scout_18",
-            "R1 Scout_19"
+            "R1 Scout_28",
+            "R1 Scout_29"
           ]
         },
-        "R1 Scout_21": {
-          "id": "R1 Scout_21",
+        "R1 Scout_31": {
+          "id": "R1 Scout_31",
           "type": "a_nav_to",
           "label": "Navigate 110,25",
           "p1": "110,25",
@@ -1183,12 +1575,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1050,
+          "x": 1800,
           "y": 420,
           "children": []
         },
-        "R1 Scout_22": {
-          "id": "R1 Scout_22",
+        "R1 Scout_32": {
+          "id": "R1 Scout_32",
           "type": "a_nav_to",
           "label": "Navigate 155,25",
           "p1": "155,25",
@@ -1204,12 +1596,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1225,
+          "x": 1980,
           "y": 420,
           "children": []
         },
-        "R1 Scout_23": {
-          "id": "R1 Scout_23",
+        "R1 Scout_33": {
+          "id": "R1 Scout_33",
           "type": "a_nav_to",
           "label": "Navigate EX1",
           "p1": "EX1",
@@ -1225,12 +1617,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1400,
+          "x": 2160,
           "y": 420,
           "children": []
         },
-        "R1 Scout_24": {
-          "id": "R1 Scout_24",
+        "R1 Scout_34": {
+          "id": "R1 Scout_34",
           "type": "selector",
           "label": "Select exploration route",
           "p1": "",
@@ -1241,15 +1633,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2056.25,
+          "x": 2835.0,
           "y": 420,
           "children": [
-            "R1 Scout_17",
-            "R1 Scout_20"
+            "R1 Scout_27",
+            "R1 Scout_30"
           ]
         },
-        "R1 Scout_25": {
-          "id": "R1 Scout_25",
+        "R1 Scout_35": {
+          "id": "R1 Scout_35",
           "type": "a_nav_to",
           "label": "Navigate 300,155",
           "p1": "300,155",
@@ -1265,12 +1657,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2625,
+          "x": 3420,
           "y": 420,
           "children": []
         },
-        "R1 Scout_26": {
-          "id": "R1 Scout_26",
+        "R1 Scout_36": {
+          "id": "R1 Scout_36",
           "type": "a_nav_to",
           "label": "Navigate 190,155",
           "p1": "190,155",
@@ -1286,12 +1678,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2800,
+          "x": 3600,
           "y": 420,
           "children": []
         },
-        "R1 Scout_27": {
-          "id": "R1 Scout_27",
+        "R1 Scout_37": {
+          "id": "R1 Scout_37",
           "type": "a_nav_to",
           "label": "Navigate RV",
           "p1": "RV",
@@ -1307,12 +1699,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2975,
+          "x": 3780,
           "y": 420,
           "children": []
         },
-        "R1 Scout_28": {
-          "id": "R1 Scout_28",
+        "R1 Scout_38": {
+          "id": "R1 Scout_38",
           "type": "a_nav_to",
           "label": "Navigate 155,25",
           "p1": "155,25",
@@ -1328,12 +1720,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3150,
+          "x": 3960,
           "y": 420,
           "children": []
         },
-        "R1 Scout_29": {
-          "id": "R1 Scout_29",
+        "R1 Scout_39": {
+          "id": "R1 Scout_39",
           "type": "a_nav_to",
           "label": "Navigate 110,25",
           "p1": "110,25",
@@ -1349,12 +1741,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3325,
+          "x": 4140,
           "y": 420,
           "children": []
         },
-        "R1 Scout_30": {
-          "id": "R1 Scout_30",
+        "R1 Scout_40": {
+          "id": "R1 Scout_40",
           "type": "a_wait",
           "label": "Exploration turnaround",
           "p1": "1",
@@ -1365,12 +1757,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3500,
+          "x": 4320,
           "y": 420,
           "children": []
         },
-        "R1 Scout_31": {
-          "id": "R1 Scout_31",
+        "R1 Scout_41": {
+          "id": "R1 Scout_41",
           "type": "mem_seq",
           "label": "Explore EX1 EX2 RV",
           "p1": "",
@@ -1381,23 +1773,23 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2410.625,
+          "x": 3199.5,
           "y": 315,
           "children": [
-            "R1 Scout_21",
-            "R1 Scout_22",
-            "R1 Scout_23",
-            "R1 Scout_24",
-            "R1 Scout_25",
-            "R1 Scout_26",
-            "R1 Scout_27",
-            "R1 Scout_28",
-            "R1 Scout_29",
-            "R1 Scout_30"
+            "R1 Scout_31",
+            "R1 Scout_32",
+            "R1 Scout_33",
+            "R1 Scout_34",
+            "R1 Scout_35",
+            "R1 Scout_36",
+            "R1 Scout_37",
+            "R1 Scout_38",
+            "R1 Scout_39",
+            "R1 Scout_40"
           ]
         },
-        "R1 Scout_32": {
-          "id": "R1 Scout_32",
+        "R1 Scout_42": {
+          "id": "R1 Scout_42",
           "type": "repeat",
           "label": "Repeat exploration",
           "p1": "1000",
@@ -1408,14 +1800,14 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2410.625,
+          "x": 3199.5,
           "y": 210,
           "children": [
-            "R1 Scout_31"
+            "R1 Scout_41"
           ]
         },
-        "R1 Scout_33": {
-          "id": "R1 Scout_33",
+        "R1 Scout_43": {
+          "id": "R1 Scout_43",
           "type": "sequence",
           "label": "Scout services and exploration",
           "p1": "",
@@ -1426,16 +1818,16 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1036.875,
+          "x": 1462.5,
           "y": 105,
           "children": [
             "R1 Scout_5",
-            "R1 Scout_11",
-            "R1 Scout_32"
+            "R1 Scout_21",
+            "R1 Scout_42"
           ]
         },
-        "R1 Scout_34": {
-          "id": "R1 Scout_34",
+        "R1 Scout_44": {
+          "id": "R1 Scout_44",
           "type": "root",
           "label": "Scout root",
           "p1": "",
@@ -1446,10 +1838,10 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1036.875,
+          "x": 1462.5,
           "y": 0,
           "children": [
-            "R1 Scout_33"
+            "R1 Scout_43"
           ]
         }
       },
@@ -1471,28 +1863,28 @@
           "to": "R1 Scout_4"
         },
         {
-          "from": "R1 Scout_10",
-          "to": "R1 Scout_9"
-        },
-        {
-          "from": "R1 Scout_11",
+          "from": "R1 Scout_8",
           "to": "R1 Scout_6"
         },
         {
-          "from": "R1 Scout_11",
+          "from": "R1 Scout_8",
           "to": "R1 Scout_7"
         },
         {
-          "from": "R1 Scout_11",
+          "from": "R1 Scout_9",
           "to": "R1 Scout_8"
         },
         {
-          "from": "R1 Scout_11",
+          "from": "R1 Scout_12",
           "to": "R1 Scout_10"
         },
         {
-          "from": "R1 Scout_16",
-          "to": "R1 Scout_13"
+          "from": "R1 Scout_12",
+          "to": "R1 Scout_11"
+        },
+        {
+          "from": "R1 Scout_13",
+          "to": "R1 Scout_12"
         },
         {
           "from": "R1 Scout_16",
@@ -1504,87 +1896,127 @@
         },
         {
           "from": "R1 Scout_17",
-          "to": "R1 Scout_12"
-        },
-        {
-          "from": "R1 Scout_17",
           "to": "R1 Scout_16"
-        },
-        {
-          "from": "R1 Scout_20",
-          "to": "R1 Scout_18"
         },
         {
           "from": "R1 Scout_20",
           "to": "R1 Scout_19"
         },
         {
-          "from": "R1 Scout_24",
+          "from": "R1 Scout_21",
+          "to": "R1 Scout_9"
+        },
+        {
+          "from": "R1 Scout_21",
+          "to": "R1 Scout_13"
+        },
+        {
+          "from": "R1 Scout_21",
           "to": "R1 Scout_17"
         },
         {
-          "from": "R1 Scout_24",
+          "from": "R1 Scout_21",
+          "to": "R1 Scout_18"
+        },
+        {
+          "from": "R1 Scout_21",
           "to": "R1 Scout_20"
         },
         {
-          "from": "R1 Scout_31",
-          "to": "R1 Scout_21"
-        },
-        {
-          "from": "R1 Scout_31",
-          "to": "R1 Scout_22"
-        },
-        {
-          "from": "R1 Scout_31",
+          "from": "R1 Scout_26",
           "to": "R1 Scout_23"
         },
         {
-          "from": "R1 Scout_31",
+          "from": "R1 Scout_26",
           "to": "R1 Scout_24"
         },
         {
-          "from": "R1 Scout_31",
+          "from": "R1 Scout_26",
           "to": "R1 Scout_25"
         },
         {
-          "from": "R1 Scout_31",
+          "from": "R1 Scout_27",
+          "to": "R1 Scout_22"
+        },
+        {
+          "from": "R1 Scout_27",
           "to": "R1 Scout_26"
         },
         {
-          "from": "R1 Scout_31",
-          "to": "R1 Scout_27"
-        },
-        {
-          "from": "R1 Scout_31",
+          "from": "R1 Scout_30",
           "to": "R1 Scout_28"
         },
         {
-          "from": "R1 Scout_31",
+          "from": "R1 Scout_30",
           "to": "R1 Scout_29"
         },
         {
-          "from": "R1 Scout_31",
-          "to": "R1 Scout_30"
-        },
-        {
-          "from": "R1 Scout_32",
-          "to": "R1 Scout_31"
-        },
-        {
-          "from": "R1 Scout_33",
-          "to": "R1 Scout_5"
-        },
-        {
-          "from": "R1 Scout_33",
-          "to": "R1 Scout_11"
-        },
-        {
-          "from": "R1 Scout_33",
-          "to": "R1 Scout_32"
+          "from": "R1 Scout_34",
+          "to": "R1 Scout_27"
         },
         {
           "from": "R1 Scout_34",
+          "to": "R1 Scout_30"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_31"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_32"
+        },
+        {
+          "from": "R1 Scout_41",
           "to": "R1 Scout_33"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_34"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_35"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_36"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_37"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_38"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_39"
+        },
+        {
+          "from": "R1 Scout_41",
+          "to": "R1 Scout_40"
+        },
+        {
+          "from": "R1 Scout_42",
+          "to": "R1 Scout_41"
+        },
+        {
+          "from": "R1 Scout_43",
+          "to": "R1 Scout_5"
+        },
+        {
+          "from": "R1 Scout_43",
+          "to": "R1 Scout_21"
+        },
+        {
+          "from": "R1 Scout_43",
+          "to": "R1 Scout_42"
+        },
+        {
+          "from": "R1 Scout_44",
+          "to": "R1 Scout_43"
         }
       ]
     },
@@ -1637,7 +2069,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 175,
+          "x": 180,
           "y": 420,
           "children": []
         },
@@ -1653,7 +2085,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 175.0,
+          "x": 180.0,
           "y": 315,
           "children": [
             "R2 Medic_3"
@@ -1671,7 +2103,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 350,
+          "x": 360,
           "y": 420,
           "children": []
         },
@@ -1687,7 +2119,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 350.0,
+          "x": 360.0,
           "y": 315,
           "children": [
             "R2 Medic_5"
@@ -1705,7 +2137,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 175.0,
+          "x": 180.0,
           "y": 210,
           "children": [
             "R2 Medic_2",
@@ -1715,6 +2147,22 @@
         },
         "R2 Medic_8": {
           "id": "R2 Medic_8",
+          "type": "a_custom",
+          "label": "Update received mission",
+          "p1": "// No ENV victim lookup: mission locations come from Scout's received topic.\nbb.known = bb.known || {};\nbb.done = bb.done || {};\nif (typeof bb.victim_report === 'string') {\n  try {\n    const report = JSON.parse(bb.victim_report);\n    for (const [id, v] of Object.entries(report.found || {})) {\n      if (['V0','V1','V2'].includes(id) && Number.isFinite(v.x) && Number.isFinite(v.y)) {\n        bb.known[id] = v;\n      }\n    }\n  } catch (e) {}\n}\nconst v2 = bb.known.V2;\nconst deadline = v2 && Number.isFinite(v2.expires) ? v2.expires : 35;\nbb.urgent = !!(v2 && !bb.done.V2 && !bb.v2_timedout && tick < deadline);\nbb.ordinary_allowed = !!(bb.done.V2 || bb.v2_timedout || tick >= deadline);\nfor (const id of ['V0','V1','V2']) {\n  bb['pending_'+id] = !!(bb.known[id] && !bb.done[id]);\n  if (bb.known[id]) bb['target_'+id] = bb.known[id].x+','+bb.known[id].y;\n}\nbb.all_rescued = !!(bb.done.V0 && bb.done.V1 && bb.done.V2);\nbb.mission_finished = !!(bb.done.V0 && bb.done.V1 && (bb.done.V2 || bb.v2_timedout || tick >= deadline));",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 540,
+          "y": 210,
+          "children": []
+        },
+        "R2 Medic_9": {
+          "id": "R2 Medic_9",
           "type": "c_bb_cmp",
           "label": "corridor_blocked == true",
           "p1": "corridor_blocked == true",
@@ -1725,12 +2173,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 875,
+          "x": 900,
           "y": 945,
           "children": []
         },
-        "R2 Medic_9": {
-          "id": "R2 Medic_9",
+        "R2 Medic_10": {
+          "id": "R2 Medic_10",
           "type": "a_nav_to",
           "label": "Navigate 295,155",
           "p1": "295,155",
@@ -1746,19 +2194,19 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1050,
+          "x": 1080,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_10": {
-          "id": "R2 Medic_10",
+        "R2 Medic_11": {
+          "id": "R2 Medic_11",
           "type": "a_nav_to",
           "label": "Approach V2",
-          "p1": "~target",
+          "p1": "target_V2",
           "p2": "",
           "p3": "",
           "params": {
-            "arrivalDist": 16,
+            "arrivalDist": 24,
             "look": 28,
             "N": 72,
             "avoid": 1.2
@@ -1767,31 +2215,31 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1225,
-          "y": 1155,
-          "children": []
-        },
-        "R2 Medic_11": {
-          "id": "R2 Medic_11",
-          "type": "a_pickup",
-          "label": "Pick up V2",
-          "p1": "",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 1400,
+          "x": 1260,
           "y": 1155,
           "children": []
         },
         "R2 Medic_12": {
           "id": "R2 Medic_12",
-          "type": "a_custom",
-          "label": "Record V2",
-          "p1": "bb.done['V2']=true; bb.carry_id='V2';",
+          "type": "c_victim",
+          "label": "Confirm visible V2 within rescue range",
+          "p1": "25",
+          "p2": "360",
+          "p3": "V2",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1440,
+          "y": 1155,
+          "children": []
+        },
+        "R2 Medic_13": {
+          "id": "R2 Medic_13",
+          "type": "a_rescue",
+          "label": "Rescue human V2",
+          "p1": "25",
           "p2": "",
           "p3": "",
           "params": {},
@@ -1799,14 +2247,30 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1575,
+          "x": 1620,
           "y": 1155,
           "children": []
         },
-        "R2 Medic_13": {
-          "id": "R2 Medic_13",
+        "R2 Medic_14": {
+          "id": "R2 Medic_14",
+          "type": "a_custom",
+          "label": "Record V2",
+          "p1": "bb.done['V2']=true; bb.last_rescued='V2'; bb.return_active=true;",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 1800,
+          "y": 1155,
+          "children": []
+        },
+        "R2 Medic_15": {
+          "id": "R2 Medic_15",
           "type": "mem_seq",
-          "label": "Collect V2",
+          "label": "Rescue V2",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -1815,16 +2279,17 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1400.0,
+          "x": 1530.0,
           "y": 1050,
           "children": [
-            "R2 Medic_10",
             "R2 Medic_11",
-            "R2 Medic_12"
+            "R2 Medic_12",
+            "R2 Medic_13",
+            "R2 Medic_14"
           ]
         },
-        "R2 Medic_14": {
-          "id": "R2 Medic_14",
+        "R2 Medic_16": {
+          "id": "R2 Medic_16",
           "type": "mem_seq",
           "label": "V2 lower bypass",
           "p1": "",
@@ -1835,15 +2300,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1225.0,
+          "x": 1305.0,
           "y": 945,
           "children": [
-            "R2 Medic_9",
-            "R2 Medic_13"
+            "R2 Medic_10",
+            "R2 Medic_15"
           ]
         },
-        "R2 Medic_15": {
-          "id": "R2 Medic_15",
+        "R2 Medic_17": {
+          "id": "R2 Medic_17",
           "type": "sequence",
           "label": "V2 blocked bypass",
           "p1": "",
@@ -1854,22 +2319,22 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1050.0,
+          "x": 1102.5,
           "y": 840,
           "children": [
-            "R2 Medic_8",
-            "R2 Medic_14"
+            "R2 Medic_9",
+            "R2 Medic_16"
           ]
         },
-        "R2 Medic_16": {
-          "id": "R2 Medic_16",
+        "R2 Medic_18": {
+          "id": "R2 Medic_18",
           "type": "a_nav_to",
           "label": "Approach V2",
-          "p1": "~target",
+          "p1": "target_V2",
           "p2": "",
           "p3": "",
           "params": {
-            "arrivalDist": 16,
+            "arrivalDist": 24,
             "look": 28,
             "N": 72,
             "avoid": 1.2
@@ -1878,46 +2343,62 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1750,
-          "y": 945,
-          "children": []
-        },
-        "R2 Medic_17": {
-          "id": "R2 Medic_17",
-          "type": "a_pickup",
-          "label": "Pick up V2",
-          "p1": "",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 1925,
-          "y": 945,
-          "children": []
-        },
-        "R2 Medic_18": {
-          "id": "R2 Medic_18",
-          "type": "a_custom",
-          "label": "Record V2",
-          "p1": "bb.done['V2']=true; bb.carry_id='V2';",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 2100,
+          "x": 1980,
           "y": 945,
           "children": []
         },
         "R2 Medic_19": {
           "id": "R2 Medic_19",
+          "type": "c_victim",
+          "label": "Confirm visible V2 within rescue range",
+          "p1": "25",
+          "p2": "360",
+          "p3": "V2",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 2160,
+          "y": 945,
+          "children": []
+        },
+        "R2 Medic_20": {
+          "id": "R2 Medic_20",
+          "type": "a_rescue",
+          "label": "Rescue human V2",
+          "p1": "25",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 2340,
+          "y": 945,
+          "children": []
+        },
+        "R2 Medic_21": {
+          "id": "R2 Medic_21",
+          "type": "a_custom",
+          "label": "Record V2",
+          "p1": "bb.done['V2']=true; bb.last_rescued='V2'; bb.return_active=true;",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 2520,
+          "y": 945,
+          "children": []
+        },
+        "R2 Medic_22": {
+          "id": "R2 Medic_22",
           "type": "mem_seq",
-          "label": "Collect V2",
+          "label": "Rescue V2",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -1926,16 +2407,17 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1925.0,
+          "x": 2250.0,
           "y": 840,
           "children": [
-            "R2 Medic_16",
-            "R2 Medic_17",
-            "R2 Medic_18"
+            "R2 Medic_18",
+            "R2 Medic_19",
+            "R2 Medic_20",
+            "R2 Medic_21"
           ]
         },
-        "R2 Medic_20": {
-          "id": "R2 Medic_20",
+        "R2 Medic_23": {
+          "id": "R2 Medic_23",
           "type": "selector",
           "label": "V2 route",
           "p1": "",
@@ -1946,18 +2428,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1487.5,
+          "x": 1676.25,
           "y": 735,
           "children": [
-            "R2 Medic_15",
-            "R2 Medic_19"
+            "R2 Medic_17",
+            "R2 Medic_22"
           ]
         },
-        "R2 Medic_21": {
-          "id": "R2 Medic_21",
+        "R2 Medic_24": {
+          "id": "R2 Medic_24",
           "type": "c_bb_cmp",
-          "label": "urgent == true AND carrying == false",
-          "p1": "urgent == true AND carrying == false",
+          "label": "urgent == true",
+          "p1": "urgent == true",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -1965,12 +2447,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 700,
+          "x": 720,
           "y": 525,
           "children": []
         },
-        "R2 Medic_22": {
-          "id": "R2 Medic_22",
+        "R2 Medic_25": {
+          "id": "R2 Medic_25",
           "type": "timeout",
           "label": "V2 deadline",
           "p1": "14",
@@ -1981,16 +2463,16 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1487.5,
+          "x": 1676.25,
           "y": 630,
           "children": [
-            "R2 Medic_20"
+            "R2 Medic_23"
           ]
         },
-        "R2 Medic_23": {
-          "id": "R2 Medic_23",
+        "R2 Medic_26": {
+          "id": "R2 Medic_26",
           "type": "a_bb_true",
-          "label": "V2 timed out",
+          "label": "V2 attempt timed out",
           "p1": "v2_timedout",
           "p2": "",
           "p3": "",
@@ -1999,12 +2481,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2275,
+          "x": 2700,
           "y": 735,
           "children": []
         },
-        "R2 Medic_24": {
-          "id": "R2 Medic_24",
+        "R2 Medic_27": {
+          "id": "R2 Medic_27",
           "type": "c_false",
           "label": "Allow fallback",
           "p1": "",
@@ -2015,12 +2497,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2450,
+          "x": 2880,
           "y": 735,
           "children": []
         },
-        "R2 Medic_25": {
-          "id": "R2 Medic_25",
+        "R2 Medic_28": {
+          "id": "R2 Medic_28",
           "type": "sequence",
           "label": "Record V2 timeout",
           "p1": "",
@@ -2031,15 +2513,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2362.5,
+          "x": 2790.0,
           "y": 630,
           "children": [
-            "R2 Medic_23",
-            "R2 Medic_24"
+            "R2 Medic_26",
+            "R2 Medic_27"
           ]
         },
-        "R2 Medic_26": {
-          "id": "R2 Medic_26",
+        "R2 Medic_29": {
+          "id": "R2 Medic_29",
           "type": "selector",
           "label": "Bounded V2 attempt",
           "p1": "",
@@ -2050,15 +2532,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1925.0,
+          "x": 2233.125,
           "y": 525,
           "children": [
-            "R2 Medic_22",
-            "R2 Medic_25"
+            "R2 Medic_25",
+            "R2 Medic_28"
           ]
         },
-        "R2 Medic_27": {
-          "id": "R2 Medic_27",
+        "R2 Medic_30": {
+          "id": "R2 Medic_30",
           "type": "sequence",
           "label": "Urgent V2 rescue",
           "p1": "",
@@ -2069,18 +2551,34 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 1312.5,
+          "x": 1476.5625,
           "y": 420,
           "children": [
-            "R2 Medic_21",
-            "R2 Medic_26"
+            "R2 Medic_24",
+            "R2 Medic_29"
           ]
         },
-        "R2 Medic_28": {
-          "id": "R2 Medic_28",
+        "R2 Medic_31": {
+          "id": "R2 Medic_31",
+          "type": "a_custom",
+          "label": "Score SZ return points",
+          "p1": "if (!bb.return_scored) {\n  const right=rob.wx>148;\n  const prefix=right ? (bb.last_rescued==='V2'\n    ? Math.hypot(rob.wx-295,rob.wy-55)+Math.hypot(295-150,55-25)+35\n    : Math.hypot(rob.wx-150,rob.wy-25)+35) : 0;\n  const cost=(x,y)=>right ? prefix+Math.hypot(115-x,25-y) : Math.hypot(rob.wx-x,rob.wy-y);\n  bb.score_north=1000/(1+cost(95,50));\n  bb.score_east=1000/(1+cost(95,80));\n  bb.return_scored=true;\n}",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 3240,
+          "y": 525,
+          "children": []
+        },
+        "R2 Medic_32": {
+          "id": "R2 Medic_32",
           "type": "c_bb_cmp",
-          "label": "carry_id == V2",
-          "p1": "carry_id == V2",
+          "label": "last_rescued == V2",
+          "p1": "last_rescued == V2",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -2088,12 +2586,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3325,
+          "x": 3780,
           "y": 945,
           "children": []
         },
-        "R2 Medic_29": {
-          "id": "R2 Medic_29",
+        "R2 Medic_33": {
+          "id": "R2 Medic_33",
           "type": "a_nav_to",
           "label": "Navigate 295,55",
           "p1": "295,55",
@@ -2109,12 +2607,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3500,
+          "x": 3960,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_30": {
-          "id": "R2 Medic_30",
+        "R2 Medic_34": {
+          "id": "R2 Medic_34",
           "type": "a_nav_to",
           "label": "Navigate 150,25",
           "p1": "150,25",
@@ -2130,12 +2628,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3675,
+          "x": 4140,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_31": {
-          "id": "R2 Medic_31",
+        "R2 Medic_35": {
+          "id": "R2 Medic_35",
           "type": "a_nav_to",
           "label": "Navigate 115,25",
           "p1": "115,25",
@@ -2151,12 +2649,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3850,
+          "x": 4320,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_32": {
-          "id": "R2 Medic_32",
+        "R2 Medic_36": {
+          "id": "R2 Medic_36",
           "type": "mem_seq",
           "label": "V2 return waypoints North",
           "p1": "",
@@ -2167,16 +2665,16 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3675.0,
+          "x": 4140.0,
           "y": 945,
           "children": [
-            "R2 Medic_29",
-            "R2 Medic_30",
-            "R2 Medic_31"
+            "R2 Medic_33",
+            "R2 Medic_34",
+            "R2 Medic_35"
           ]
         },
-        "R2 Medic_33": {
-          "id": "R2 Medic_33",
+        "R2 Medic_37": {
+          "id": "R2 Medic_37",
           "type": "sequence",
           "label": "V2 return North",
           "p1": "",
@@ -2187,18 +2685,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3500.0,
+          "x": 3960.0,
           "y": 840,
           "children": [
-            "R2 Medic_28",
-            "R2 Medic_32"
+            "R2 Medic_32",
+            "R2 Medic_36"
           ]
         },
-        "R2 Medic_34": {
-          "id": "R2 Medic_34",
+        "R2 Medic_38": {
+          "id": "R2 Medic_38",
           "type": "c_bb_cmp",
-          "label": "carry_id == V1",
-          "p1": "carry_id == V1",
+          "label": "last_rescued == V1",
+          "p1": "last_rescued == V1",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -2206,12 +2704,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4025,
+          "x": 4500,
           "y": 945,
           "children": []
         },
-        "R2 Medic_35": {
-          "id": "R2 Medic_35",
+        "R2 Medic_39": {
+          "id": "R2 Medic_39",
           "type": "a_nav_to",
           "label": "Navigate 150,25",
           "p1": "150,25",
@@ -2227,12 +2725,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4200,
+          "x": 4680,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_36": {
-          "id": "R2 Medic_36",
+        "R2 Medic_40": {
+          "id": "R2 Medic_40",
           "type": "a_nav_to",
           "label": "Navigate 115,25",
           "p1": "115,25",
@@ -2248,12 +2746,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4375,
+          "x": 4860,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_37": {
-          "id": "R2 Medic_37",
+        "R2 Medic_41": {
+          "id": "R2 Medic_41",
           "type": "mem_seq",
           "label": "V1 return waypoints North",
           "p1": "",
@@ -2264,15 +2762,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4287.5,
+          "x": 4770.0,
           "y": 945,
           "children": [
-            "R2 Medic_35",
-            "R2 Medic_36"
+            "R2 Medic_39",
+            "R2 Medic_40"
           ]
         },
-        "R2 Medic_38": {
-          "id": "R2 Medic_38",
+        "R2 Medic_42": {
+          "id": "R2 Medic_42",
           "type": "sequence",
           "label": "V1 return North",
           "p1": "",
@@ -2283,15 +2781,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4156.25,
+          "x": 4635.0,
           "y": 840,
           "children": [
-            "R2 Medic_34",
-            "R2 Medic_37"
+            "R2 Medic_38",
+            "R2 Medic_41"
           ]
         },
-        "R2 Medic_39": {
-          "id": "R2 Medic_39",
+        "R2 Medic_43": {
+          "id": "R2 Medic_43",
           "type": "c_true",
           "label": "Already west of W1 North",
           "p1": "",
@@ -2302,12 +2800,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4550,
+          "x": 5040,
           "y": 840,
           "children": []
         },
-        "R2 Medic_40": {
-          "id": "R2 Medic_40",
+        "R2 Medic_44": {
+          "id": "R2 Medic_44",
           "type": "selector",
           "label": "Return path North",
           "p1": "",
@@ -2318,18 +2816,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4068.75,
+          "x": 4545.0,
           "y": 735,
           "children": [
-            "R2 Medic_33",
-            "R2 Medic_38",
-            "R2 Medic_39"
+            "R2 Medic_37",
+            "R2 Medic_42",
+            "R2 Medic_43"
           ]
         },
-        "R2 Medic_41": {
-          "id": "R2 Medic_41",
+        "R2 Medic_45": {
+          "id": "R2 Medic_45",
           "type": "a_nav_to",
-          "label": "Navigate SZ North",
+          "label": "Reach SZ North",
           "p1": "95,50",
           "p2": "",
           "p3": "",
@@ -2343,86 +2841,51 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 4725,
+          "x": 5220,
           "y": 735,
           "children": []
-        },
-        "R2 Medic_42": {
-          "id": "R2 Medic_42",
-          "type": "a_dropoff",
-          "label": "Drop off North",
-          "p1": "",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 4900,
-          "y": 840,
-          "children": []
-        },
-        "R2 Medic_43": {
-          "id": "R2 Medic_43",
-          "type": "force_ok",
-          "label": "Optional operation",
-          "p1": "",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 4900.0,
-          "y": 735,
-          "children": [
-            "R2 Medic_42"
-          ]
-        },
-        "R2 Medic_44": {
-          "id": "R2 Medic_44",
-          "type": "a_custom",
-          "label": "Finish delivery North",
-          "p1": "bb.delivery_active=false;",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 5075,
-          "y": 735,
-          "children": []
-        },
-        "R2 Medic_45": {
-          "id": "R2 Medic_45",
-          "type": "mem_seq",
-          "label": "Drop North",
-          "p1": "",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 4692.1875,
-          "y": 630,
-          "children": [
-            "R2 Medic_40",
-            "R2 Medic_41",
-            "R2 Medic_43",
-            "R2 Medic_44"
-          ]
         },
         "R2 Medic_46": {
           "id": "R2 Medic_46",
+          "type": "a_custom",
+          "label": "Finish return North",
+          "p1": "bb.return_active=false;\nbb.return_scored=false;\nbb.returns_completed=(bb.returns_completed||0)+1;",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 5400,
+          "y": 735,
+          "children": []
+        },
+        "R2 Medic_47": {
+          "id": "R2 Medic_47",
+          "type": "mem_seq",
+          "label": "Return North",
+          "p1": "",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 5055.0,
+          "y": 630,
+          "children": [
+            "R2 Medic_44",
+            "R2 Medic_45",
+            "R2 Medic_46"
+          ]
+        },
+        "R2 Medic_48": {
+          "id": "R2 Medic_48",
           "type": "c_bb_cmp",
-          "label": "carry_id == V2",
-          "p1": "carry_id == V2",
+          "label": "last_rescued == V2",
+          "p1": "last_rescued == V2",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -2430,12 +2893,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5250,
+          "x": 5580,
           "y": 945,
           "children": []
         },
-        "R2 Medic_47": {
-          "id": "R2 Medic_47",
+        "R2 Medic_49": {
+          "id": "R2 Medic_49",
           "type": "a_nav_to",
           "label": "Navigate 295,55",
           "p1": "295,55",
@@ -2451,12 +2914,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5425,
+          "x": 5760,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_48": {
-          "id": "R2 Medic_48",
+        "R2 Medic_50": {
+          "id": "R2 Medic_50",
           "type": "a_nav_to",
           "label": "Navigate 150,25",
           "p1": "150,25",
@@ -2472,12 +2935,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5600,
+          "x": 5940,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_49": {
-          "id": "R2 Medic_49",
+        "R2 Medic_51": {
+          "id": "R2 Medic_51",
           "type": "a_nav_to",
           "label": "Navigate 115,25",
           "p1": "115,25",
@@ -2493,12 +2956,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5775,
+          "x": 6120,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_50": {
-          "id": "R2 Medic_50",
+        "R2 Medic_52": {
+          "id": "R2 Medic_52",
           "type": "mem_seq",
           "label": "V2 return waypoints East",
           "p1": "",
@@ -2509,16 +2972,16 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5600.0,
+          "x": 5940.0,
           "y": 945,
           "children": [
-            "R2 Medic_47",
-            "R2 Medic_48",
-            "R2 Medic_49"
+            "R2 Medic_49",
+            "R2 Medic_50",
+            "R2 Medic_51"
           ]
         },
-        "R2 Medic_51": {
-          "id": "R2 Medic_51",
+        "R2 Medic_53": {
+          "id": "R2 Medic_53",
           "type": "sequence",
           "label": "V2 return East",
           "p1": "",
@@ -2529,18 +2992,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5425.0,
+          "x": 5760.0,
           "y": 840,
           "children": [
-            "R2 Medic_46",
-            "R2 Medic_50"
+            "R2 Medic_48",
+            "R2 Medic_52"
           ]
         },
-        "R2 Medic_52": {
-          "id": "R2 Medic_52",
+        "R2 Medic_54": {
+          "id": "R2 Medic_54",
           "type": "c_bb_cmp",
-          "label": "carry_id == V1",
-          "p1": "carry_id == V1",
+          "label": "last_rescued == V1",
+          "p1": "last_rescued == V1",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -2548,12 +3011,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5950,
+          "x": 6300,
           "y": 945,
           "children": []
         },
-        "R2 Medic_53": {
-          "id": "R2 Medic_53",
+        "R2 Medic_55": {
+          "id": "R2 Medic_55",
           "type": "a_nav_to",
           "label": "Navigate 150,25",
           "p1": "150,25",
@@ -2569,12 +3032,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6125,
+          "x": 6480,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_54": {
-          "id": "R2 Medic_54",
+        "R2 Medic_56": {
+          "id": "R2 Medic_56",
           "type": "a_nav_to",
           "label": "Navigate 115,25",
           "p1": "115,25",
@@ -2590,12 +3053,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6300,
+          "x": 6660,
           "y": 1050,
           "children": []
         },
-        "R2 Medic_55": {
-          "id": "R2 Medic_55",
+        "R2 Medic_57": {
+          "id": "R2 Medic_57",
           "type": "mem_seq",
           "label": "V1 return waypoints East",
           "p1": "",
@@ -2606,15 +3069,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6212.5,
+          "x": 6570.0,
           "y": 945,
           "children": [
-            "R2 Medic_53",
-            "R2 Medic_54"
+            "R2 Medic_55",
+            "R2 Medic_56"
           ]
         },
-        "R2 Medic_56": {
-          "id": "R2 Medic_56",
+        "R2 Medic_58": {
+          "id": "R2 Medic_58",
           "type": "sequence",
           "label": "V1 return East",
           "p1": "",
@@ -2625,15 +3088,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6081.25,
+          "x": 6435.0,
           "y": 840,
           "children": [
-            "R2 Medic_52",
-            "R2 Medic_55"
+            "R2 Medic_54",
+            "R2 Medic_57"
           ]
         },
-        "R2 Medic_57": {
-          "id": "R2 Medic_57",
+        "R2 Medic_59": {
+          "id": "R2 Medic_59",
           "type": "c_true",
           "label": "Already west of W1 East",
           "p1": "",
@@ -2644,12 +3107,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6475,
+          "x": 6840,
           "y": 840,
           "children": []
         },
-        "R2 Medic_58": {
-          "id": "R2 Medic_58",
+        "R2 Medic_60": {
+          "id": "R2 Medic_60",
           "type": "selector",
           "label": "Return path East",
           "p1": "",
@@ -2660,18 +3123,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5993.75,
+          "x": 6345.0,
           "y": 735,
           "children": [
-            "R2 Medic_51",
-            "R2 Medic_56",
-            "R2 Medic_57"
+            "R2 Medic_53",
+            "R2 Medic_58",
+            "R2 Medic_59"
           ]
         },
-        "R2 Medic_59": {
-          "id": "R2 Medic_59",
+        "R2 Medic_61": {
+          "id": "R2 Medic_61",
           "type": "a_nav_to",
-          "label": "Navigate SZ East",
+          "label": "Reach SZ East",
           "p1": "95,80",
           "p2": "",
           "p3": "",
@@ -2685,49 +3148,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6650,
+          "x": 7020,
           "y": 735,
           "children": []
-        },
-        "R2 Medic_60": {
-          "id": "R2 Medic_60",
-          "type": "a_dropoff",
-          "label": "Drop off East",
-          "p1": "",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 6825,
-          "y": 840,
-          "children": []
-        },
-        "R2 Medic_61": {
-          "id": "R2 Medic_61",
-          "type": "force_ok",
-          "label": "Optional operation",
-          "p1": "",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 6825.0,
-          "y": 735,
-          "children": [
-            "R2 Medic_60"
-          ]
         },
         "R2 Medic_62": {
           "id": "R2 Medic_62",
           "type": "a_custom",
-          "label": "Finish delivery East",
-          "p1": "bb.delivery_active=false;",
+          "label": "Finish return East",
+          "p1": "bb.return_active=false;\nbb.return_scored=false;\nbb.returns_completed=(bb.returns_completed||0)+1;",
           "p2": "",
           "p3": "",
           "params": {},
@@ -2735,14 +3164,14 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7000,
+          "x": 7200,
           "y": 735,
           "children": []
         },
         "R2 Medic_63": {
           "id": "R2 Medic_63",
           "type": "mem_seq",
-          "label": "Drop East",
+          "label": "Return East",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -2751,11 +3180,10 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6617.1875,
+          "x": 6855.0,
           "y": 630,
           "children": [
-            "R2 Medic_58",
-            "R2 Medic_59",
+            "R2 Medic_60",
             "R2 Medic_61",
             "R2 Medic_62"
           ]
@@ -2763,8 +3191,8 @@
         "R2 Medic_64": {
           "id": "R2 Medic_64",
           "type": "c_bb_cmp",
-          "label": "carrying == true OR delivery_active == true",
-          "p1": "carrying == true OR delivery_active == true",
+          "label": "return_active == true",
+          "p1": "return_active == true",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -2772,31 +3200,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2625,
+          "x": 3060,
           "y": 525,
           "children": []
         },
         "R2 Medic_65": {
           "id": "R2 Medic_65",
-          "type": "a_custom",
-          "label": "Score safe drop points",
-          "p1": "if (!bb.delivery_active) {\n  bb.delivery_active=true;\n  const tail=(x,y)=>Math.hypot(115-x,25-y);\n  const right=rob.wx>148;\n  const prefix=right ? (bb.carry_id==='V2' ? Math.hypot(rob.wx-295,rob.wy-55)+Math.hypot(295-150,55-25)+35 : Math.hypot(rob.wx-150,rob.wy-25)+35) : 0;\n  const cost=(x,y)=>right ? prefix+tail(x,y) : Math.hypot(rob.wx-x,rob.wy-y);\n  bb.score_north=1000/(1+cost(95,50));\n  bb.score_east=1000/(1+cost(95,80));\n}\n",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 2800,
-          "y": 525,
-          "children": []
-        },
-        "R2 Medic_66": {
-          "id": "R2 Medic_66",
           "type": "a_util_change",
           "label": "Score North",
-          "p1": "Drop North",
+          "p1": "Return North",
           "p2": "set",
           "p3": "bb:score_north",
           "params": {},
@@ -2804,15 +3216,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2975,
+          "x": 3420,
           "y": 525,
           "children": []
         },
-        "R2 Medic_67": {
-          "id": "R2 Medic_67",
+        "R2 Medic_66": {
+          "id": "R2 Medic_66",
           "type": "a_util_change",
           "label": "Score East",
-          "p1": "Drop East",
+          "p1": "Return East",
           "p2": "set",
           "p3": "bb:score_east",
           "params": {},
@@ -2820,14 +3232,14 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3150,
+          "x": 3600,
           "y": 525,
           "children": []
         },
-        "R2 Medic_68": {
-          "id": "R2 Medic_68",
+        "R2 Medic_67": {
+          "id": "R2 Medic_67",
           "type": "utility_sel",
-          "label": "Choose SZ drop point",
+          "label": "Choose SZ return point",
           "p1": "max",
           "p2": "",
           "p3": "",
@@ -2836,17 +3248,17 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 5654.6875,
+          "x": 5955.0,
           "y": 525,
           "children": [
-            "R2 Medic_45",
+            "R2 Medic_47",
             "R2 Medic_63"
           ]
         },
-        "R2 Medic_69": {
-          "id": "R2 Medic_69",
+        "R2 Medic_68": {
+          "id": "R2 Medic_68",
           "type": "sequence",
-          "label": "Deliver carried victim",
+          "label": "Return to SZ after rescue",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -2855,18 +3267,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 3440.9375,
+          "x": 3855.0,
           "y": 420,
           "children": [
             "R2 Medic_64",
+            "R2 Medic_31",
             "R2 Medic_65",
             "R2 Medic_66",
-            "R2 Medic_67",
-            "R2 Medic_68"
+            "R2 Medic_67"
           ]
         },
-        "R2 Medic_70": {
-          "id": "R2 Medic_70",
+        "R2 Medic_69": {
+          "id": "R2 Medic_69",
           "type": "c_bb_cmp",
           "label": "pending_V2 == false",
           "p1": "pending_V2 == false",
@@ -2877,12 +3289,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7350,
+          "x": 7560,
           "y": 840,
           "children": []
         },
-        "R2 Medic_71": {
-          "id": "R2 Medic_71",
+        "R2 Medic_70": {
+          "id": "R2 Medic_70",
           "type": "a_nav_to",
           "label": "Navigate 115,25",
           "p1": "115,25",
@@ -2898,12 +3310,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7525,
+          "x": 7740,
           "y": 945,
           "children": []
         },
-        "R2 Medic_72": {
-          "id": "R2 Medic_72",
+        "R2 Medic_71": {
+          "id": "R2 Medic_71",
           "type": "a_nav_to",
           "label": "Navigate 150,25",
           "p1": "150,25",
@@ -2919,12 +3331,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7700,
+          "x": 7920,
           "y": 945,
           "children": []
         },
-        "R2 Medic_73": {
-          "id": "R2 Medic_73",
+        "R2 Medic_72": {
+          "id": "R2 Medic_72",
           "type": "mem_seq",
           "label": "V1 west approach",
           "p1": "",
@@ -2935,17 +3347,17 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7612.5,
+          "x": 7830.0,
           "y": 840,
           "children": [
-            "R2 Medic_71",
-            "R2 Medic_72"
+            "R2 Medic_70",
+            "R2 Medic_71"
           ]
         },
-        "R2 Medic_74": {
-          "id": "R2 Medic_74",
+        "R2 Medic_73": {
+          "id": "R2 Medic_73",
           "type": "sequence",
-          "label": "After V2 delivery",
+          "label": "After V2 rescue",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -2954,15 +3366,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7481.25,
+          "x": 7695.0,
           "y": 735,
           "children": [
-            "R2 Medic_70",
-            "R2 Medic_73"
+            "R2 Medic_69",
+            "R2 Medic_72"
           ]
         },
-        "R2 Medic_75": {
-          "id": "R2 Medic_75",
+        "R2 Medic_74": {
+          "id": "R2 Medic_74",
           "type": "a_nav_to",
           "label": "Navigate 295,155",
           "p1": "295,155",
@@ -2978,12 +3390,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7875,
+          "x": 8100,
           "y": 840,
           "children": []
         },
-        "R2 Medic_76": {
-          "id": "R2 Medic_76",
+        "R2 Medic_75": {
+          "id": "R2 Medic_75",
           "type": "a_nav_to",
           "label": "Navigate 295,55",
           "p1": "295,55",
@@ -2999,12 +3411,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8050,
+          "x": 8280,
           "y": 840,
           "children": []
         },
-        "R2 Medic_77": {
-          "id": "R2 Medic_77",
+        "R2 Medic_76": {
+          "id": "R2 Medic_76",
           "type": "a_nav_to",
           "label": "Navigate 150,25",
           "p1": "150,25",
@@ -3020,12 +3432,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8225,
+          "x": 8460,
           "y": 840,
           "children": []
         },
-        "R2 Medic_78": {
-          "id": "R2 Medic_78",
+        "R2 Medic_77": {
+          "id": "R2 Medic_77",
           "type": "mem_seq",
           "label": "V1 approach after missed V2",
           "p1": "",
@@ -3036,16 +3448,16 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8050.0,
+          "x": 8280.0,
           "y": 735,
           "children": [
+            "R2 Medic_74",
             "R2 Medic_75",
-            "R2 Medic_76",
-            "R2 Medic_77"
+            "R2 Medic_76"
           ]
         },
-        "R2 Medic_79": {
-          "id": "R2 Medic_79",
+        "R2 Medic_78": {
+          "id": "R2 Medic_78",
           "type": "selector",
           "label": "Select V1 approach",
           "p1": "",
@@ -3056,18 +3468,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7765.625,
+          "x": 7987.5,
           "y": 630,
           "children": [
-            "R2 Medic_74",
-            "R2 Medic_78"
+            "R2 Medic_73",
+            "R2 Medic_77"
           ]
         },
-        "R2 Medic_80": {
-          "id": "R2 Medic_80",
+        "R2 Medic_79": {
+          "id": "R2 Medic_79",
           "type": "c_bb_cmp",
-          "label": "ordinary_allowed == true AND pending_V1 == true AND carrying == false",
-          "p1": "ordinary_allowed == true AND pending_V1 == true AND carrying == false",
+          "label": "ordinary_allowed == true AND pending_V1 == true",
+          "p1": "ordinary_allowed == true AND pending_V1 == true",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -3075,19 +3487,19 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7175,
+          "x": 7380,
           "y": 525,
           "children": []
         },
-        "R2 Medic_81": {
-          "id": "R2 Medic_81",
+        "R2 Medic_80": {
+          "id": "R2 Medic_80",
           "type": "a_nav_to",
           "label": "Approach V1",
-          "p1": "~target",
+          "p1": "target_V1",
           "p2": "",
           "p3": "",
           "params": {
-            "arrivalDist": 16,
+            "arrivalDist": 24,
             "look": 28,
             "N": 72,
             "avoid": 1.2
@@ -3096,15 +3508,31 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8400,
+          "x": 8640,
+          "y": 735,
+          "children": []
+        },
+        "R2 Medic_81": {
+          "id": "R2 Medic_81",
+          "type": "c_victim",
+          "label": "Confirm visible V1 within rescue range",
+          "p1": "25",
+          "p2": "360",
+          "p3": "V1",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 8820,
           "y": 735,
           "children": []
         },
         "R2 Medic_82": {
           "id": "R2 Medic_82",
-          "type": "a_pickup",
-          "label": "Pick up V1",
-          "p1": "",
+          "type": "a_rescue",
+          "label": "Rescue human V1",
+          "p1": "25",
           "p2": "",
           "p3": "",
           "params": {},
@@ -3112,7 +3540,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8575,
+          "x": 9000,
           "y": 735,
           "children": []
         },
@@ -3120,7 +3548,7 @@
           "id": "R2 Medic_83",
           "type": "a_custom",
           "label": "Record V1",
-          "p1": "bb.done['V1']=true; bb.carry_id='V1';",
+          "p1": "bb.done['V1']=true; bb.last_rescued='V1'; bb.return_active=true;",
           "p2": "",
           "p3": "",
           "params": {},
@@ -3128,14 +3556,14 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8750,
+          "x": 9180,
           "y": 735,
           "children": []
         },
         "R2 Medic_84": {
           "id": "R2 Medic_84",
           "type": "mem_seq",
-          "label": "Collect V1",
+          "label": "Rescue V1",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -3144,9 +3572,10 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8575.0,
+          "x": 8910.0,
           "y": 630,
           "children": [
+            "R2 Medic_80",
             "R2 Medic_81",
             "R2 Medic_82",
             "R2 Medic_83"
@@ -3164,10 +3593,10 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8170.3125,
+          "x": 8448.75,
           "y": 525,
           "children": [
-            "R2 Medic_79",
+            "R2 Medic_78",
             "R2 Medic_84"
           ]
         },
@@ -3183,18 +3612,18 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 7672.65625,
+          "x": 7914.375,
           "y": 420,
           "children": [
-            "R2 Medic_80",
+            "R2 Medic_79",
             "R2 Medic_85"
           ]
         },
         "R2 Medic_87": {
           "id": "R2 Medic_87",
           "type": "c_bb_cmp",
-          "label": "ordinary_allowed == true AND pending_V0 == true AND carrying == false",
-          "p1": "ordinary_allowed == true AND pending_V0 == true AND carrying == false",
+          "label": "ordinary_allowed == true AND pending_V0 == true",
+          "p1": "ordinary_allowed == true AND pending_V0 == true",
           "p2": "local",
           "p3": "",
           "params": {},
@@ -3202,7 +3631,7 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 8925,
+          "x": 9360,
           "y": 525,
           "children": []
         },
@@ -3210,11 +3639,11 @@
           "id": "R2 Medic_88",
           "type": "a_nav_to",
           "label": "Approach V0",
-          "p1": "~target",
+          "p1": "target_V0",
           "p2": "",
           "p3": "",
           "params": {
-            "arrivalDist": 16,
+            "arrivalDist": 24,
             "look": 28,
             "N": 72,
             "avoid": 1.2
@@ -3223,31 +3652,31 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9100,
+          "x": 9540,
           "y": 630,
           "children": []
         },
         "R2 Medic_89": {
           "id": "R2 Medic_89",
-          "type": "a_pickup",
-          "label": "Pick up V0",
-          "p1": "",
-          "p2": "",
-          "p3": "",
+          "type": "c_victim",
+          "label": "Confirm visible V0 within rescue range",
+          "p1": "25",
+          "p2": "360",
+          "p3": "V0",
           "params": {},
           "utility": 0,
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9275,
+          "x": 9720,
           "y": 630,
           "children": []
         },
         "R2 Medic_90": {
           "id": "R2 Medic_90",
-          "type": "a_custom",
-          "label": "Record V0",
-          "p1": "bb.done['V0']=true; bb.carry_id='V0';",
+          "type": "a_rescue",
+          "label": "Rescue human V0",
+          "p1": "25",
           "p2": "",
           "p3": "",
           "params": {},
@@ -3255,14 +3684,30 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9450,
+          "x": 9900,
           "y": 630,
           "children": []
         },
         "R2 Medic_91": {
           "id": "R2 Medic_91",
+          "type": "a_custom",
+          "label": "Record V0",
+          "p1": "bb.done['V0']=true; bb.last_rescued='V0'; bb.return_active=true;",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 10080,
+          "y": 630,
+          "children": []
+        },
+        "R2 Medic_92": {
+          "id": "R2 Medic_92",
           "type": "mem_seq",
-          "label": "Collect V0",
+          "label": "Rescue V0",
           "p1": "",
           "p2": "",
           "p3": "",
@@ -3271,16 +3716,17 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9275.0,
+          "x": 9810.0,
           "y": 525,
           "children": [
             "R2 Medic_88",
             "R2 Medic_89",
-            "R2 Medic_90"
+            "R2 Medic_90",
+            "R2 Medic_91"
           ]
         },
-        "R2 Medic_92": {
-          "id": "R2 Medic_92",
+        "R2 Medic_93": {
+          "id": "R2 Medic_93",
           "type": "sequence",
           "label": "Ordinary V0 rescue",
           "p1": "",
@@ -3291,15 +3737,66 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9100.0,
+          "x": 9585.0,
           "y": 420,
           "children": [
             "R2 Medic_87",
-            "R2 Medic_91"
+            "R2 Medic_92"
           ]
         },
-        "R2 Medic_93": {
-          "id": "R2 Medic_93",
+        "R2 Medic_94": {
+          "id": "R2 Medic_94",
+          "type": "c_bb_cmp",
+          "label": "mission_finished == true",
+          "p1": "mission_finished == true",
+          "p2": "local",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 10260,
+          "y": 525,
+          "children": []
+        },
+        "R2 Medic_95": {
+          "id": "R2 Medic_95",
+          "type": "a_wait",
+          "label": "Wait safely at SZ",
+          "p1": "1",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 10440,
+          "y": 525,
+          "children": []
+        },
+        "R2 Medic_96": {
+          "id": "R2 Medic_96",
+          "type": "sequence",
+          "label": "Available rescues complete",
+          "p1": "",
+          "p2": "",
+          "p3": "",
+          "params": {},
+          "utility": 0,
+          "robotAs": -1,
+          "status": "idle",
+          "note": "",
+          "x": 10350.0,
+          "y": 420,
+          "children": [
+            "R2 Medic_94",
+            "R2 Medic_95"
+          ]
+        },
+        "R2 Medic_97": {
+          "id": "R2 Medic_97",
           "type": "a_nav_to",
           "label": "Navigate 295,155",
           "p1": "295,155",
@@ -3315,12 +3812,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9625,
+          "x": 10620,
           "y": 525,
           "children": []
         },
-        "R2 Medic_94": {
-          "id": "R2 Medic_94",
+        "R2 Medic_98": {
+          "id": "R2 Medic_98",
           "type": "a_wait",
           "label": "Wait for rescue report",
           "p1": "1",
@@ -3331,12 +3828,12 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9800,
+          "x": 10800,
           "y": 525,
           "children": []
         },
-        "R2 Medic_95": {
-          "id": "R2 Medic_95",
+        "R2 Medic_99": {
+          "id": "R2 Medic_99",
           "type": "mem_seq",
           "label": "Stage east of facility",
           "p1": "",
@@ -3347,15 +3844,15 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 9712.5,
+          "x": 10710.0,
           "y": 420,
           "children": [
-            "R2 Medic_93",
-            "R2 Medic_94"
+            "R2 Medic_97",
+            "R2 Medic_98"
           ]
         },
-        "R2 Medic_96": {
-          "id": "R2 Medic_96",
+        "R2 Medic_100": {
+          "id": "R2 Medic_100",
           "type": "selector",
           "label": "Medic priorities",
           "p1": "",
@@ -3366,34 +3863,19 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6247.71875,
+          "x": 7315.15625,
           "y": 315,
           "children": [
-            "R2 Medic_27",
-            "R2 Medic_69",
+            "R2 Medic_30",
+            "R2 Medic_68",
             "R2 Medic_86",
-            "R2 Medic_92",
-            "R2 Medic_95"
+            "R2 Medic_93",
+            "R2 Medic_96",
+            "R2 Medic_99"
           ]
         },
-        "R2 Medic_97": {
-          "id": "R2 Medic_97",
-          "type": "a_custom",
-          "label": "Update received mission",
-          "p1": "// Only R2's received messages and local mission state are used here.\nbb.known = bb.known || {}; bb.done = bb.done || {};\nif (typeof bb.victim_report === 'string') {\n  try { const m=JSON.parse(bb.victim_report); Object.assign(bb.known,m.found||{}); } catch(e) {}\n}\nconst v2=bb.known.V2;\nbb.urgent=!!(v2 && !bb.done.V2 && !bb.v2_timedout && tick<v2.expires);\nbb.ordinary_allowed=!!(bb.done.V2 || bb.v2_timedout || (v2 ? tick>=v2.expires : tick>=35));\nfor (const id of ['V0','V1','V2']) {\n  bb['pending_'+id]=!!(bb.known[id] && !bb.done[id]);\n  if (bb.known[id]) {\n    for(const n of Object.values(nodes).filter(n=>n.label==='Approach '+id)) { n.params=n.params||{}; n.params.target=bb.known[id].x+','+bb.known[id].y; }\n  }\n}\n",
-          "p2": "",
-          "p3": "",
-          "params": {},
-          "utility": 0,
-          "robotAs": -1,
-          "status": "idle",
-          "note": "",
-          "x": 525,
-          "y": 210,
-          "children": []
-        },
-        "R2 Medic_98": {
-          "id": "R2 Medic_98",
+        "R2 Medic_101": {
+          "id": "R2 Medic_101",
           "type": "repeat",
           "label": "Repeat medic work",
           "p1": "1000",
@@ -3404,14 +3886,14 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 6247.71875,
+          "x": 7315.15625,
           "y": 210,
           "children": [
-            "R2 Medic_96"
+            "R2 Medic_100"
           ]
         },
-        "R2 Medic_99": {
-          "id": "R2 Medic_99",
+        "R2 Medic_102": {
+          "id": "R2 Medic_102",
           "type": "sequence",
           "label": "Medic services and work",
           "p1": "",
@@ -3422,16 +3904,16 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2315.90625,
+          "x": 2678.3854166666665,
           "y": 105,
           "children": [
             "R2 Medic_7",
-            "R2 Medic_97",
-            "R2 Medic_98"
+            "R2 Medic_8",
+            "R2 Medic_101"
           ]
         },
-        "R2 Medic_100": {
-          "id": "R2 Medic_100",
+        "R2 Medic_103": {
+          "id": "R2 Medic_103",
           "type": "root",
           "label": "Medic root",
           "p1": "",
@@ -3442,10 +3924,10 @@
           "robotAs": -1,
           "status": "idle",
           "note": "",
-          "x": 2315.90625,
+          "x": 2678.3854166666665,
           "y": 0,
           "children": [
-            "R2 Medic_99"
+            "R2 Medic_102"
           ]
         }
       },
@@ -3475,51 +3957,43 @@
           "to": "R2 Medic_6"
         },
         {
-          "from": "R2 Medic_13",
-          "to": "R2 Medic_10"
-        },
-        {
-          "from": "R2 Medic_13",
+          "from": "R2 Medic_15",
           "to": "R2 Medic_11"
         },
         {
-          "from": "R2 Medic_13",
+          "from": "R2 Medic_15",
           "to": "R2 Medic_12"
         },
         {
-          "from": "R2 Medic_14",
-          "to": "R2 Medic_9"
-        },
-        {
-          "from": "R2 Medic_14",
-          "to": "R2 Medic_13"
-        },
-        {
           "from": "R2 Medic_15",
-          "to": "R2 Medic_8"
+          "to": "R2 Medic_13"
         },
         {
           "from": "R2 Medic_15",
           "to": "R2 Medic_14"
         },
         {
-          "from": "R2 Medic_19",
-          "to": "R2 Medic_16"
+          "from": "R2 Medic_16",
+          "to": "R2 Medic_10"
         },
         {
-          "from": "R2 Medic_19",
-          "to": "R2 Medic_17"
-        },
-        {
-          "from": "R2 Medic_19",
-          "to": "R2 Medic_18"
-        },
-        {
-          "from": "R2 Medic_20",
+          "from": "R2 Medic_16",
           "to": "R2 Medic_15"
         },
         {
-          "from": "R2 Medic_20",
+          "from": "R2 Medic_17",
+          "to": "R2 Medic_9"
+        },
+        {
+          "from": "R2 Medic_17",
+          "to": "R2 Medic_16"
+        },
+        {
+          "from": "R2 Medic_22",
+          "to": "R2 Medic_18"
+        },
+        {
+          "from": "R2 Medic_22",
           "to": "R2 Medic_19"
         },
         {
@@ -3527,156 +4001,156 @@
           "to": "R2 Medic_20"
         },
         {
+          "from": "R2 Medic_22",
+          "to": "R2 Medic_21"
+        },
+        {
+          "from": "R2 Medic_23",
+          "to": "R2 Medic_17"
+        },
+        {
+          "from": "R2 Medic_23",
+          "to": "R2 Medic_22"
+        },
+        {
           "from": "R2 Medic_25",
           "to": "R2 Medic_23"
         },
         {
-          "from": "R2 Medic_25",
-          "to": "R2 Medic_24"
-        },
-        {
-          "from": "R2 Medic_26",
-          "to": "R2 Medic_22"
-        },
-        {
-          "from": "R2 Medic_26",
-          "to": "R2 Medic_25"
-        },
-        {
-          "from": "R2 Medic_27",
-          "to": "R2 Medic_21"
-        },
-        {
-          "from": "R2 Medic_27",
+          "from": "R2 Medic_28",
           "to": "R2 Medic_26"
         },
         {
-          "from": "R2 Medic_32",
-          "to": "R2 Medic_29"
+          "from": "R2 Medic_28",
+          "to": "R2 Medic_27"
         },
         {
-          "from": "R2 Medic_32",
-          "to": "R2 Medic_30"
+          "from": "R2 Medic_29",
+          "to": "R2 Medic_25"
         },
         {
-          "from": "R2 Medic_32",
-          "to": "R2 Medic_31"
-        },
-        {
-          "from": "R2 Medic_33",
+          "from": "R2 Medic_29",
           "to": "R2 Medic_28"
         },
         {
-          "from": "R2 Medic_33",
-          "to": "R2 Medic_32"
+          "from": "R2 Medic_30",
+          "to": "R2 Medic_24"
+        },
+        {
+          "from": "R2 Medic_30",
+          "to": "R2 Medic_29"
+        },
+        {
+          "from": "R2 Medic_36",
+          "to": "R2 Medic_33"
+        },
+        {
+          "from": "R2 Medic_36",
+          "to": "R2 Medic_34"
+        },
+        {
+          "from": "R2 Medic_36",
+          "to": "R2 Medic_35"
         },
         {
           "from": "R2 Medic_37",
-          "to": "R2 Medic_35"
+          "to": "R2 Medic_32"
         },
         {
           "from": "R2 Medic_37",
           "to": "R2 Medic_36"
         },
         {
-          "from": "R2 Medic_38",
-          "to": "R2 Medic_34"
-        },
-        {
-          "from": "R2 Medic_38",
-          "to": "R2 Medic_37"
-        },
-        {
-          "from": "R2 Medic_40",
-          "to": "R2 Medic_33"
-        },
-        {
-          "from": "R2 Medic_40",
-          "to": "R2 Medic_38"
-        },
-        {
-          "from": "R2 Medic_40",
+          "from": "R2 Medic_41",
           "to": "R2 Medic_39"
         },
         {
-          "from": "R2 Medic_43",
-          "to": "R2 Medic_42"
-        },
-        {
-          "from": "R2 Medic_45",
+          "from": "R2 Medic_41",
           "to": "R2 Medic_40"
         },
         {
-          "from": "R2 Medic_45",
+          "from": "R2 Medic_42",
+          "to": "R2 Medic_38"
+        },
+        {
+          "from": "R2 Medic_42",
           "to": "R2 Medic_41"
         },
         {
-          "from": "R2 Medic_45",
+          "from": "R2 Medic_44",
+          "to": "R2 Medic_37"
+        },
+        {
+          "from": "R2 Medic_44",
+          "to": "R2 Medic_42"
+        },
+        {
+          "from": "R2 Medic_44",
           "to": "R2 Medic_43"
         },
         {
-          "from": "R2 Medic_45",
+          "from": "R2 Medic_47",
           "to": "R2 Medic_44"
         },
         {
-          "from": "R2 Medic_50",
-          "to": "R2 Medic_47"
+          "from": "R2 Medic_47",
+          "to": "R2 Medic_45"
         },
         {
-          "from": "R2 Medic_50",
-          "to": "R2 Medic_48"
-        },
-        {
-          "from": "R2 Medic_50",
-          "to": "R2 Medic_49"
-        },
-        {
-          "from": "R2 Medic_51",
+          "from": "R2 Medic_47",
           "to": "R2 Medic_46"
         },
         {
-          "from": "R2 Medic_51",
+          "from": "R2 Medic_52",
+          "to": "R2 Medic_49"
+        },
+        {
+          "from": "R2 Medic_52",
           "to": "R2 Medic_50"
         },
         {
-          "from": "R2 Medic_55",
-          "to": "R2 Medic_53"
-        },
-        {
-          "from": "R2 Medic_55",
-          "to": "R2 Medic_54"
-        },
-        {
-          "from": "R2 Medic_56",
-          "to": "R2 Medic_52"
-        },
-        {
-          "from": "R2 Medic_56",
-          "to": "R2 Medic_55"
-        },
-        {
-          "from": "R2 Medic_58",
+          "from": "R2 Medic_52",
           "to": "R2 Medic_51"
         },
         {
-          "from": "R2 Medic_58",
+          "from": "R2 Medic_53",
+          "to": "R2 Medic_48"
+        },
+        {
+          "from": "R2 Medic_53",
+          "to": "R2 Medic_52"
+        },
+        {
+          "from": "R2 Medic_57",
+          "to": "R2 Medic_55"
+        },
+        {
+          "from": "R2 Medic_57",
           "to": "R2 Medic_56"
+        },
+        {
+          "from": "R2 Medic_58",
+          "to": "R2 Medic_54"
         },
         {
           "from": "R2 Medic_58",
           "to": "R2 Medic_57"
         },
         {
-          "from": "R2 Medic_61",
-          "to": "R2 Medic_60"
+          "from": "R2 Medic_60",
+          "to": "R2 Medic_53"
         },
         {
-          "from": "R2 Medic_63",
+          "from": "R2 Medic_60",
           "to": "R2 Medic_58"
         },
         {
-          "from": "R2 Medic_63",
+          "from": "R2 Medic_60",
           "to": "R2 Medic_59"
+        },
+        {
+          "from": "R2 Medic_63",
+          "to": "R2 Medic_60"
         },
         {
           "from": "R2 Medic_63",
@@ -3687,68 +4161,72 @@
           "to": "R2 Medic_62"
         },
         {
-          "from": "R2 Medic_68",
-          "to": "R2 Medic_45"
+          "from": "R2 Medic_67",
+          "to": "R2 Medic_47"
         },
         {
-          "from": "R2 Medic_68",
+          "from": "R2 Medic_67",
           "to": "R2 Medic_63"
         },
         {
-          "from": "R2 Medic_69",
+          "from": "R2 Medic_68",
           "to": "R2 Medic_64"
         },
         {
-          "from": "R2 Medic_69",
+          "from": "R2 Medic_68",
+          "to": "R2 Medic_31"
+        },
+        {
+          "from": "R2 Medic_68",
           "to": "R2 Medic_65"
         },
         {
-          "from": "R2 Medic_69",
+          "from": "R2 Medic_68",
           "to": "R2 Medic_66"
         },
         {
-          "from": "R2 Medic_69",
+          "from": "R2 Medic_68",
           "to": "R2 Medic_67"
         },
         {
-          "from": "R2 Medic_69",
-          "to": "R2 Medic_68"
+          "from": "R2 Medic_72",
+          "to": "R2 Medic_70"
+        },
+        {
+          "from": "R2 Medic_72",
+          "to": "R2 Medic_71"
         },
         {
           "from": "R2 Medic_73",
-          "to": "R2 Medic_71"
+          "to": "R2 Medic_69"
         },
         {
           "from": "R2 Medic_73",
           "to": "R2 Medic_72"
         },
         {
-          "from": "R2 Medic_74",
-          "to": "R2 Medic_70"
+          "from": "R2 Medic_77",
+          "to": "R2 Medic_74"
         },
         {
-          "from": "R2 Medic_74",
-          "to": "R2 Medic_73"
-        },
-        {
-          "from": "R2 Medic_78",
+          "from": "R2 Medic_77",
           "to": "R2 Medic_75"
         },
         {
-          "from": "R2 Medic_78",
+          "from": "R2 Medic_77",
           "to": "R2 Medic_76"
+        },
+        {
+          "from": "R2 Medic_78",
+          "to": "R2 Medic_73"
         },
         {
           "from": "R2 Medic_78",
           "to": "R2 Medic_77"
         },
         {
-          "from": "R2 Medic_79",
-          "to": "R2 Medic_74"
-        },
-        {
-          "from": "R2 Medic_79",
-          "to": "R2 Medic_78"
+          "from": "R2 Medic_84",
+          "to": "R2 Medic_80"
         },
         {
           "from": "R2 Medic_84",
@@ -3764,7 +4242,7 @@
         },
         {
           "from": "R2 Medic_85",
-          "to": "R2 Medic_79"
+          "to": "R2 Medic_78"
         },
         {
           "from": "R2 Medic_85",
@@ -3772,67 +4250,43 @@
         },
         {
           "from": "R2 Medic_86",
-          "to": "R2 Medic_80"
+          "to": "R2 Medic_79"
         },
         {
           "from": "R2 Medic_86",
           "to": "R2 Medic_85"
         },
         {
-          "from": "R2 Medic_91",
+          "from": "R2 Medic_92",
           "to": "R2 Medic_88"
         },
         {
-          "from": "R2 Medic_91",
+          "from": "R2 Medic_92",
           "to": "R2 Medic_89"
         },
         {
-          "from": "R2 Medic_91",
-          "to": "R2 Medic_90"
-        },
-        {
           "from": "R2 Medic_92",
-          "to": "R2 Medic_87"
+          "to": "R2 Medic_90"
         },
         {
           "from": "R2 Medic_92",
           "to": "R2 Medic_91"
         },
         {
-          "from": "R2 Medic_95",
-          "to": "R2 Medic_93"
+          "from": "R2 Medic_93",
+          "to": "R2 Medic_87"
         },
         {
-          "from": "R2 Medic_95",
-          "to": "R2 Medic_94"
-        },
-        {
-          "from": "R2 Medic_96",
-          "to": "R2 Medic_27"
-        },
-        {
-          "from": "R2 Medic_96",
-          "to": "R2 Medic_69"
-        },
-        {
-          "from": "R2 Medic_96",
-          "to": "R2 Medic_86"
-        },
-        {
-          "from": "R2 Medic_96",
+          "from": "R2 Medic_93",
           "to": "R2 Medic_92"
         },
         {
           "from": "R2 Medic_96",
+          "to": "R2 Medic_94"
+        },
+        {
+          "from": "R2 Medic_96",
           "to": "R2 Medic_95"
-        },
-        {
-          "from": "R2 Medic_98",
-          "to": "R2 Medic_96"
-        },
-        {
-          "from": "R2 Medic_99",
-          "to": "R2 Medic_7"
         },
         {
           "from": "R2 Medic_99",
@@ -3844,7 +4298,47 @@
         },
         {
           "from": "R2 Medic_100",
+          "to": "R2 Medic_30"
+        },
+        {
+          "from": "R2 Medic_100",
+          "to": "R2 Medic_68"
+        },
+        {
+          "from": "R2 Medic_100",
+          "to": "R2 Medic_86"
+        },
+        {
+          "from": "R2 Medic_100",
+          "to": "R2 Medic_93"
+        },
+        {
+          "from": "R2 Medic_100",
+          "to": "R2 Medic_96"
+        },
+        {
+          "from": "R2 Medic_100",
           "to": "R2 Medic_99"
+        },
+        {
+          "from": "R2 Medic_101",
+          "to": "R2 Medic_100"
+        },
+        {
+          "from": "R2 Medic_102",
+          "to": "R2 Medic_7"
+        },
+        {
+          "from": "R2 Medic_102",
+          "to": "R2 Medic_8"
+        },
+        {
+          "from": "R2 Medic_102",
+          "to": "R2 Medic_101"
+        },
+        {
+          "from": "R2 Medic_103",
+          "to": "R2 Medic_102"
         }
       ]
     },
@@ -4399,39 +4893,16 @@
         "y": 80
       }
     ],
-    "packages": [
-      {
-        "x": 100,
-        "y": 100,
-        "label": "V0",
-        "collected": false
-      },
-      {
-        "x": 220,
-        "y": 55,
-        "label": "V1",
-        "collected": false
-      },
-      {
-        "x": 290,
-        "y": 90,
-        "label": "V2",
-        "collected": false,
-        "hidden": true,
-        "waitTicks": 20,
-        "timeoutTicks": 15
-      }
-    ],
+    "packages": [],
     "collectionZones": [
       {
-        "x": 60,
+        "x": 55,
         "y": 45,
-        "w": 40,
-        "h": 40,
+        "w": 55,
+        "h": 45,
         "label": "Safe Zone",
-        "color": "#22a060",
-        "capacity": 3,
-        "collected": 0
+        "collected": 0,
+        "capacity": 10
       }
     ],
     "dynObstacles": [],
@@ -4444,6 +4915,36 @@
         "rate": 20
       }
     ],
-    "lightSources": []
+    "lightSources": [],
+    "victims": [
+      {
+        "id": "V0",
+        "x": 100,
+        "y": 100,
+        "rescued": false,
+        "label": "V0",
+        "color": "#cc4444"
+      },
+      {
+        "id": "V1",
+        "x": 220,
+        "y": 55,
+        "rescued": false,
+        "label": "V1",
+        "color": "#cc8800"
+      },
+      {
+        "id": "V2",
+        "x": 290,
+        "y": 90,
+        "rescued": false,
+        "label": "V2",
+        "color": "#cc0000",
+        "hidden": true,
+        "waitTicks": 20,
+        "timeoutTicks": 15
+      }
+    ],
+    "dirt": []
   }
 }

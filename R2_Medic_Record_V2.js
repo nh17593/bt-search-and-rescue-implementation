@@ -1,1 +1,1 @@
-bb.done['V2']=true; bb.carry_id='V2';
+bb.done['V2']=true; bb.last_rescued='V2'; bb.return_active=true;
