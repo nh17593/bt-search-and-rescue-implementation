@@ -1,1 +1,0 @@
-bb.delivery_active=false;
